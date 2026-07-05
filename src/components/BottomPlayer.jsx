@@ -2,6 +2,10 @@ export default function BottomPlayer() {
   return (
     <div className="fixed bottom-[4.5rem] md:bottom-gutter left-gutter right-gutter md:left-[18rem] md:right-xl z-50">
       <div className="glass-panel border border-white/10 rounded-2xl md:rounded-full p-2 flex items-center gap-md shadow-2xl">
+        <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-white/10 overflow-hidden rounded-full">
+          <div className="primary-gradient h-full w-[45%]" id="player-progress"></div>
+        </div>
+
         <div className="flex items-center gap-sm flex-1">
           <div className="w-12 h-12 rounded-lg md:rounded-full overflow-hidden flex-none shadow-lg">
             <img
@@ -32,10 +36,6 @@ export default function BottomPlayer() {
           <button className="text-on-surface-variant hover:text-primary transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
-        </div>
-
-        <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-white/10 overflow-hidden rounded-full">
-          <div className="primary-gradient h-full w-[45%]" id="player-progress"></div>
         </div>
       </div>
     </div>

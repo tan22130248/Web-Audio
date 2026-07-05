@@ -21,7 +21,7 @@ export default function Home() {
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-lg">
               <div className="text-white">
-                <span className="bg-primary/20 backdrop-blur-md px-sm py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-xs inline-block">Huyền huyễn</span>
+                <span className="bg-primary/20 backdrop-blur-md px-sm py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-xs inline-block">HUYỀN HUYỄN</span>
                 <h3 className="font-headline-md text-xl md:text-2xl">Mộng Hoa Lục</h3>
                 <p className="text-white/70 text-sm">Tác giả: Thiên Diệp</p>
               </div>
@@ -44,7 +44,7 @@ export default function Home() {
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-lg">
               <div className="text-white">
-                <span className="bg-secondary/20 backdrop-blur-md px-sm py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-xs inline-block">Ngôn tình</span>
+                <span className="bg-secondary/20 backdrop-blur-md px-sm py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-xs inline-block">NGÔN TÌNH</span>
                 <h3 className="font-headline-md text-xl md:text-2xl">Sài Gòn Mưa Rơi</h3>
                 <p className="text-white/70 text-sm">Tác giả: Mộc Trà</p>
               </div>
@@ -67,7 +67,7 @@ export default function Home() {
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-lg">
               <div className="text-white">
-                <span className="bg-tertiary/20 backdrop-blur-md px-sm py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-xs inline-block">Kinh dị</span>
+                <span className="bg-tertiary/20 backdrop-blur-md px-sm py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-xs inline-block">KINH DỊ</span>
                 <h3 className="font-headline-md text-xl md:text-2xl">Oán Hồn Xóm Nhỏ</h3>
                 <p className="text-white/70 text-sm">Tác giả: Kỳ Án</p>
               </div>
@@ -258,7 +258,7 @@ export default function Home() {
             </div>
 
             <div className="z-10 text-center md:text-left">
-              <span className="text-secondary font-bold text-xs uppercase tracking-widest">Đang thịnh hành</span>
+              <span className="text-secondary font-bold text-xs uppercase tracking-widest">ĐANG THỊNH HÀNH</span>
               <h3 className="font-display-lg text-2xl md:text-3xl mb-xs">Hào Khí Thăng Long</h3>
               <p className="text-on-surface-variant mb-md max-w-md">Cuộc hành trình hào hùng về lịch sử dân tộc qua giọng đọc truyền cảm của NSƯT Thanh Hải.</p>
 
