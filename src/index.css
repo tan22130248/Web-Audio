@@ -1,6 +1,144 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #aa3bff;
-  --color-primary-dark: #7d2ec7;
+  --color-surface-container: "#1e1e32";
+  --color-surface-container-highest: "#333348";
+  --color-surface-bright: "#37374d";
+  --color-on-secondary-fixed: "#3e0022";
+  --color-on-primary-container: "#ede0ff";
+  --color-outline-variant: "#4a4455";
+  --color-surface-tint: "#d2bbff";
+  --color-on-tertiary: "#4f2500";
+  --color-primary-fixed: "#eaddff";
+  --color-primary-container: "#7c3aed";
+  --color-on-primary-fixed: "#25005a";
+  --color-on-tertiary-fixed: "#301400";
+  --color-secondary-fixed-dim: "#ffb0cd";
+  --color-inverse-on-surface: "#2f2e44";
+  --color-secondary: "#ffb0cd";
+  --color-on-secondary-container: "#ffbad3";
+  --color-secondary-fixed: "#ffd9e4";
+  --color-on-primary-fixed-variant: "#5a00c6";
+  --color-error-container: "#93000a";
+  --color-on-surface: "#e2e0fc";
+  --color-tertiary-container: "#a05100";
+  --color-inverse-primary: "#732ee4";
+  --color-surface: "#111125";
+  --color-surface-dim: "#111125";
+  --color-surface-container-low: "#1a1a2e";
+  --color-surface-container-lowest: "#0c0c20";
+  --color-on-tertiary-container: "#ffdfcb";
+  --color-on-secondary: "#640039";
+  --color-on-primary: "#3f008e";
+  --color-inverse-surface: "#e2e0fc";
+  --color-on-error-container: "#ffdad6";
+  --color-background: "#111125";
+  --color-outline: "#958da1";
+  --color-tertiary: "#ffb783";
+  --color-surface-variant: "#333348";
+  --color-surface-container-high: "#28283d";
+  --color-on-tertiary-fixed-variant: "#713700";
+  --color-primary-fixed-dim: "#d2bbff";
+  --color-on-background: "#e2e0fc";
+  --color-on-error: "#690005";
+  --color-tertiary-fixed: "#ffdcc5";
+  --color-error: "#ffb4ab";
+  --color-on-secondary-fixed-variant: "#8c0053";
+  --color-primary: "#d2bbff";
+  --color-secondary-container: "#aa0266";
+  --color-tertiary-fixed-dim: "#ffb783";
+  --color-on-surface-variant: "#ccc3d8";
+
+  --breakpoint-xs: "320px";
+
+  --font-display-lg: "Montserrat";
+  --font-label-bold: "Be Vietnam Pro";
+  --font-display-lg-mobile: "Montserrat";
+  --font-headline-md: "Montserrat";
+  --font-title-lg: "Be Vietnam Pro";
+  --font-body-sm: "Be Vietnam Pro";
+  --font-body-lg: "Be Vietnam Pro";
+
+  --text-display-lg: "40px";
+  --text-display-lg--line-height: "48px";
+  --text-display-lg--letter-spacing: "-0.02em";
+  --text-display-lg--font-weight: "800";
+
+  --text-label-bold: "12px";
+  --text-label-bold--line-height: "16px";
+  --text-label-bold--letter-spacing: "0.05em";
+  --text-label-bold--font-weight: "700";
+
+  --text-display-lg-mobile: "32px";
+  --text-display-lg-mobile--line-height: "38px";
+  --text-display-lg-mobile--letter-spacing: "-0.02em";
+  --text-display-lg-mobile--font-weight: "800";
+
+  --text-headline-md: "24px";
+  --text-headline-md--line-height: "32px";
+  --text-headline-md--font-weight: "700";
+
+  --text-title-lg: "20px";
+  --text-title-lg--line-height: "28px";
+  --text-title-lg--font-weight: "600";
+
+  --text-body-sm: "14px";
+  --text-body-sm--line-height: "20px";
+  --text-body-sm--font-weight: "400";
+
+  --text-body-lg: "16px";
+  --text-body-lg--line-height: "24px";
+  --text-body-lg--font-weight: "400";
+
+  --spacing-lg: "24px";
+  --spacing-gutter: "16px";
+  --spacing-base: "4px";
+  --spacing-xs: "8px";
+  --spacing-xl: "32px";
+  --spacing-container-margin: "20px";
+  --spacing-md: "16px";
+  --spacing-sm: "12px";
+
+  --radius-default: "0.25rem";
+  --radius-lg: "0.5rem";
+  --radius-xl: "0.75rem";
+  --radius-full: "9999px";
+}
+
+body {
+  background-color: #0f0f23;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, #7c3aed 0%, #aa0266 50%, #ffb783 100%);
+}
+
+.premium-shimmer {
+  background: linear-gradient(90deg, #7c3aed, #aa0266, #ffb783, #7c3aed);
+  background-size: 300% 100%;
+  animation: shimmer 4s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
