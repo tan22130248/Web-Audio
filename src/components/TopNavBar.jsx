@@ -2,35 +2,41 @@ import { Link } from "react-router-dom";
 
 export default function TopNavBar() {
   return (
-    <header className="fixed top-0 w-full z-40 flex items-center justify-between px-gutter py-xs md:px-xl md:pl-[18rem] bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 shadow-sm transition-all">
-      <div className="flex items-center gap-md flex-1">
-        <div className="md:hidden font-display-lg-mobile text-primary font-extrabold">AudioStory</div>
-        <div className="relative w-full max-w-md hidden md:block">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-          <input
-            className="w-full bg-surface-container/50 border-none rounded-full py-2.5 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 text-body-sm transition-all"
-            placeholder="Tìm kiếm truyện, tác giả..."
-            type="text"
-          />
+    <header className="fixed top-0 z-40 w-full border-b border-white/10 bg-[#0b0b1f]/90 px-4 py-3 shadow-lg shadow-black/20 backdrop-blur-xl md:pl-44 md:pr-8">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
+        <div className="flex flex-1 items-center gap-3">
+          <Link to="/" className="font-display-lg-mobile text-lg font-extrabold text-white md:hidden">
+            AudioStory
+          </Link>
+          <div className="relative hidden w-full max-w-[360px] md:block">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[15px] text-white/55">
+              search
+            </span>
+            <input
+              className="h-8 w-full rounded-full border border-white/10 bg-white/7 pl-9 pr-4 text-[11px] font-semibold text-white outline-none placeholder:text-white/45 transition-all focus:border-primary/60 focus:bg-white/10 focus:ring-2 focus:ring-primary/35"
+              placeholder="Tìm kiếm truyện, tác giả..."
+              type="text"
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center gap-md">
-        <button className="premium-shimmer text-white px-md py-2 rounded-full font-label-bold flex items-center gap-xs scale-95 active:scale-90 transition-transform">
-          <span className="material-symbols-outlined text-[18px]">workspace_premium</span>
-          <span className="hidden sm:inline">Nâng cấp Premium</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <Link to="/premium" className="premium-shimmer flex h-7 items-center gap-1 rounded-full px-3 text-[10px] font-extrabold text-white shadow-lg shadow-primary-container/20 transition-transform active:scale-95">
+            <span className="material-symbols-outlined text-[14px]">workspace_premium</span>
+            <span className="hidden sm:inline">Nâng cấp Premium</span>
+          </Link>
 
-        <button className="p-2 text-on-surface-variant hover:bg-surface-bright/20 rounded-full transition-all">
-          <span className="material-symbols-outlined">notifications</span>
-        </button>
+          <button className="flex h-8 w-8 items-center justify-center rounded-full text-white/75 transition-all hover:bg-white/10 hover:text-white">
+            <span className="material-symbols-outlined text-[18px]">notifications</span>
+          </button>
 
-        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20 cursor-pointer">
-          <img
-            className="w-full h-full object-cover"
-            data-alt="A portrait of a Gen Z Vietnamese user with a stylish aesthetic, soft neon purple lighting reflecting on their face, high-quality digital photography style with a blurred tech-inspired background."
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIuBN1zy52wRs9rnYcmKKKvjVdOmcKPz4_CV_IaticrnUtjpogQ2g_RdhzgcxL3Q136bvNulN2pnuA-Jho5wF4nPd9sJBg3_CablcfWf_JuOXGWnxK9389jfxFdeNJVkFQgUQToaoGYuSRNoVH5qAJ7HrKi_S09mOTE67xncb685mfZwm18sOy0f8U7ljs6KHiTfuNMgjiBadmt94u3zv4V-L0OWYi1cm8knZGypLJyvAEbookJyHrTwxfKNDobjuQ1ZSpbXeiTzx4"
-          />
+          <div className="h-8 w-8 cursor-pointer overflow-hidden rounded-full border-2 border-white/20 shadow-md">
+            <img
+              className="h-full w-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIuBN1zy52wRs9rnYcmKKKvjVdOmcKPz4_CV_IaticrnUtjpogQ2g_RdhzgcxL3Q136bvNulN2pnuA-Jho5wF4nPd9sJBg3_CablcfWf_JuOXGWnxK9389jfxFdeNJVkFQgUQToaoGYuSRNoVH5qAJ7HrKi_S09mOTE67xncb685mfZwm18sOy0f8U7ljs6KHiTfuNMgjiBadmt94u3zv4V-L0OWYi1cm8knZGypLJyvAEbookJyHrTwxfKNDobjuQ1ZSpbXeiTzx4"
+              alt="Tài khoản"
+            />
+          </div>
         </div>
       </div>
     </header>

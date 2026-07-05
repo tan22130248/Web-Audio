@@ -1,52 +1,60 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
+
+const mainLinks = [
+  ["Trang chủ", "home", "/"],
+  ["Khám phá", "explore", "/explore"],
+  ["Thể loại", "category", "/categories"],
+  ["Yêu thích", "favorite", "/favorites"],
+  ["Lịch sử nghe", "history", "/history"],
+  ["Premium", "workspace_premium", "/premium"],
+];
 
 export default function SideNavBar() {
   return (
-    <nav className="hidden md:flex flex-col h-screen fixed left-0 top-0 p-md w-64 bg-surface-container-low/95 backdrop-blur-2xl border-r border-outline-variant/10 shadow-xl z-50">
-      <div className="flex items-center gap-sm mb-xl px-sm">
-        <div className="w-10 h-10 rounded-xl primary-gradient flex items-center justify-center text-white">
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>mic_external_on</span>
+    <nav className="hidden md:flex fixed left-0 top-0 z-50 h-screen w-40 flex-col border-r border-white/10 bg-[#09091b]/95 p-3 shadow-2xl backdrop-blur-2xl">
+      <div className="mb-6 flex items-center gap-2 rounded-xl bg-white/5 px-2 py-2 ring-1 ring-white/10">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg primary-gradient text-white shadow-lg shadow-primary-container/25">
+          <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+            mic_external_on
+          </span>
         </div>
-        <div>
-          <h1 className="font-display-lg text-primary text-xl leading-tight">AudioStory</h1>
-          <p className="text-xs text-on-surface-variant opacity-70">Phòng thu số</p>
+        <div className="min-w-0">
+          <h1 className="truncate text-[15px] font-extrabold leading-4 text-white">AudioStory</h1>
+          <p className="truncate text-[9px] font-semibold text-white/55">Phòng thu số</p>
         </div>
       </div>
 
-      <div className="flex-1 space-y-xs overflow-y-auto hide-scrollbar">
-        <Link to="/" className="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container rounded-full font-bold transition-all duration-200 ease-in-out">
-          <span className="material-symbols-outlined">home</span>
-          <span>Trang chủ</span>
-        </Link>
-        <Link to="/explore" className="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full transition-all duration-200 ease-in-out">
-          <span className="material-symbols-outlined">explore</span>
-          <span>Khám phá</span>
-        </Link>
-        <Link to="/categories" className="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full transition-all duration-200 ease-in-out">
-          <span className="material-symbols-outlined">category</span>
-          <span>Thể loại</span>
-        </Link>
-        <Link to="/favorites" className="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full transition-all duration-200 ease-in-out">
-          <span className="material-symbols-outlined">favorite</span>
-          <span>Yêu thích</span>
-        </Link>
-        <Link to="/history" className="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full transition-all duration-200 ease-in-out">
-          <span className="material-symbols-outlined">history</span>
-          <span>Lịch sử nghe</span>
-        </Link>
-        <Link to="/premium" className="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full transition-all duration-200 ease-in-out">
-          <span className="material-symbols-outlined">workspace_premium</span>
-          <span>Premium</span>
-        </Link>
+      <div className="flex-1 space-y-1 overflow-y-auto hide-scrollbar">
+        {mainLinks.map(([label, icon, to]) => (
+          <NavLink
+            className={({ isActive }) => `flex items-center gap-2 rounded-full px-3 py-2 text-[12px] font-extrabold transition-all ${
+              isActive
+                ? "primary-gradient text-white shadow-lg shadow-primary-container/25"
+                : "text-white/70 hover:bg-white/10 hover:text-white"
+            }`}
+            key={label}
+            to={to}
+            end={to === "/"}
+          >
+            <span className="material-symbols-outlined text-[16px]">{icon}</span>
+            <span className="truncate">{label}</span>
+          </NavLink>
+        ))}
       </div>
 
-      <div className="pt-md mt-md border-t border-outline-variant/10 space-y-xs">
-        <Link to="/settings" className="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full transition-all">
-          <span className="material-symbols-outlined">settings</span>
+      <div className="space-y-1 border-t border-white/10 pt-3">
+        <Link
+          to="/settings"
+          className="flex items-center gap-2 rounded-full px-3 py-2 text-[12px] font-bold text-white/70 transition-all hover:bg-white/10 hover:text-white"
+        >
+          <span className="material-symbols-outlined text-[16px]">settings</span>
           <span>Cài đặt</span>
         </Link>
-        <Link to="/logout" className="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full transition-all">
-          <span className="material-symbols-outlined">logout</span>
+        <Link
+          to="/logout"
+          className="flex items-center gap-2 rounded-full px-3 py-2 text-[12px] font-bold text-white/70 transition-all hover:bg-white/10 hover:text-white"
+        >
+          <span className="material-symbols-outlined text-[16px]">logout</span>
           <span>Đăng xuất</span>
         </Link>
       </div>
