@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import AdminSidebar from "../components/AdminSidebar";
 
-const API_BASE = "/api/audios";
+import { apiUrl } from "../config/api";
+
+const API_BASE = apiUrl("/api/audios");
 const DEFAULT_COVER = "https://ui-avatars.com/api/?name=Audio&background=7c3aed&color=fff&size=128";
 
 const genres = [

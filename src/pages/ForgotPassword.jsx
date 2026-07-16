@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-const API_BASE = "/api/auth";
+import { apiUrl } from "../config/api";
+
+const API_BASE = apiUrl("/api/auth");
 
 export default function ForgotPassword() {
   const [step, setStep] = useState(1);

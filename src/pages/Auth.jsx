@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { apiUrl } from "../config/api";
 
-const API_BASE = "/api/auth";
+const API_BASE = apiUrl("/api/auth");
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 const GOOGLE_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
 

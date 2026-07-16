@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import qrImage from "../assets/QR.png";
+import { apiUrl } from "../config/api";
 
 const plans = [
   {
@@ -76,7 +77,7 @@ export default function Premium() {
   useEffect(() => {
     const email = localStorage.getItem("email");
     if (!email) return;
-    fetch(`/api/premium/registrations?email=${encodeURIComponent(email)}`)
+    fetch(apiUrl(`/api/premium/registrations?email=${encodeURIComponent(email)}`))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.data)) {
@@ -93,7 +94,7 @@ export default function Premium() {
   useEffect(() => {
     const email = localStorage.getItem("email");
     if (!email) return;
-    fetch(`/api/auth/me?email=${encodeURIComponent(email)}`)
+    fetch(apiUrl(`/api/auth/me?email=${encodeURIComponent(email)}`))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && data?.data) {
@@ -166,7 +167,7 @@ export default function Premium() {
       formData.append("price", selectedPlan.price);
       if (receiptFile) formData.append("receipt", receiptFile);
 
-      const res = await fetch("/api/premium/register", {
+      const res = await fetch(apiUrl("/api/premium/register"), {
         method: "POST",
         body: formData,
       });

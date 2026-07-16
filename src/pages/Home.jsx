@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { shouldShowAds } from "../hooks/useAdRequirement";
 import AdStickyBar from "../components/AdStickyBar";
+import { apiUrl } from "../config/api";
 
 const GENRE_TONE = {
   "Tổng tài": "bg-primary/20 text-primary border-primary/25",
@@ -269,7 +270,7 @@ export default function Home({ activeStory, onActiveStoryChange, onPlayStory, cu
     const email = localStorage.getItem("email");
     if (!email || !addToPlaylist) return;
     try {
-      const res = await fetch("/api/playlists", {
+      const res = await fetch(apiUrl("/api/playlists"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: playlistName, userEmail: email }),
@@ -295,7 +296,7 @@ export default function Home({ activeStory, onActiveStoryChange, onPlayStory, cu
   }, [addModalOpen]);
 
   useEffect(() => {
-    fetch("/api/audios")
+    fetch(apiUrl("/api/audios"))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.data)) {
@@ -313,7 +314,7 @@ export default function Home({ activeStory, onActiveStoryChange, onPlayStory, cu
   useEffect(() => {
     const email = localStorage.getItem("email");
     if (!email) return;
-    fetch(`/api/history?email=${encodeURIComponent(email)}`)
+    fetch(apiUrl(`/api/history?email=${encodeURIComponent(email)}`))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.data)) {

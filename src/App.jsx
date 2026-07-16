@@ -19,6 +19,7 @@ import Playlists from './pages/Playlists'
 import StoryPlayerModal from './components/StoryPlayerModal'
 import { useAdRequirement, shouldShowAds } from './hooks/useAdRequirement'
 import toast from "react-hot-toast"
+import { apiUrl } from "./config/api";
 
 function AdminRouteGuard({ children }) {
   const role = localStorage.getItem('role');
@@ -68,7 +69,7 @@ function App() {
   useEffect(() => {
     const email = localStorage.getItem("email");
     if (!email) return;
-    fetch(`/api/audios/liked?email=${encodeURIComponent(email)}`)
+    fetch(apiUrl(`/api/audios/liked?email=${encodeURIComponent(email)}`))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.data)) {
@@ -88,7 +89,7 @@ function App() {
   async function handleAdWatch() {
     try {
       setAdLoading(true);
-      const res = await fetch("/api/ads/random");
+      const res = await fetch(apiUrl("/api/ads/random"));
       const data = await res.json().catch(() => ({}));
       if (data?.success && data.data?.url) {
         window.open(data.data.url, "_blank", "noopener,noreferrer");
@@ -128,7 +129,7 @@ function App() {
 
   async function incrementView(audioId) {
     try {
-      await fetch(`/api/audios/${audioId}/view`, { method: "POST" });
+      await fetch(apiUrl(`/api/audios/${audioId}/view`), { method: "POST" });
     } catch {
       // ignore view count errors
     }
@@ -144,7 +145,7 @@ function App() {
     const email = localStorage.getItem("email");
     if (!email) return;
     try {
-      const res = await fetch(`/api/audios/${audioId}/like`, {
+      const res = await fetch(apiUrl(`/api/audios/${audioId}/like`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -175,7 +176,7 @@ function App() {
     const email = signalEmail || localStorage.getItem("email");
     if (!email) return;
     try {
-      const res = await fetch(`/api/playlists?email=${encodeURIComponent(email)}`);
+      const res = await fetch(apiUrl(`/api/playlists?email=${encodeURIComponent(email)}`));
       const data = await res.json().catch(() => ({}));
       if (data?.success && Array.isArray(data.data)) {
         setPlaylists(data.data);
@@ -191,7 +192,7 @@ function App() {
   async function addToPlaylist(playlistId, audioId) {
     const email = localStorage.getItem("email");
     try {
-      const res = await fetch(`/api/playlists/${playlistId}/audio/${audioId}`, {
+      const res = await fetch(apiUrl(`/api/playlists/${playlistId}/audio/${audioId}`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userEmail: email }),
@@ -207,7 +208,7 @@ function App() {
     const email = localStorage.getItem("email");
     if (!email || !story?.id) return;
     try {
-      await fetch("/api/history", {
+      await fetch(apiUrl("/api/history"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -231,7 +232,7 @@ function App() {
     if (!email || !story?.id || !duration) return;
     const progress = Math.max(0, Math.min(100, Math.round((currentTime / duration) * 100)));
     try {
-      await fetch("/api/history/progress", {
+      await fetch(apiUrl("/api/history/progress"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const API_BASE = "/api/history";
+import { apiUrl } from "../config/api";
+
+const API_BASE = apiUrl("/api/history");
 
 function mapHistoryToStory(item) {
   return {

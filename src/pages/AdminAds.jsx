@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import AdminSidebar from "../components/AdminSidebar";
 
-const API_BASE = "/api/ads/admin";
+import { apiUrl } from "../config/api";
+
+const API_BASE = apiUrl("/api/ads/admin");
 
 export default function AdminAds() {
   const navigate = useNavigate();

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { apiUrl } from "../config/api";
 
 function mapAudioToStory(audio) {
   return {
@@ -26,7 +27,7 @@ export default function Favorites({ onPlayStory, currentTrack, onTogglePlay }) {
       setLoading(false);
       return;
     }
-    fetch(`/api/favorites?email=${encodeURIComponent(email)}`)
+    fetch(apiUrl(`/api/favorites?email=${encodeURIComponent(email)}`))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.data)) {

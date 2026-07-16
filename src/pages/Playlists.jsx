@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import SideNavBar from "../components/SideNavBar";
 import TopNavBar from "../components/TopNavBar";
 import toast from "react-hot-toast";
+import { apiUrl } from "../config/api";
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -42,7 +43,7 @@ export default function Playlists({ playlists: externalPlaylists, refreshPlaylis
       return;
     }
     if (!email) { setLoading(false); return; }
-    fetch(`/api/playlists?email=${encodeURIComponent(email)}`)
+    fetch(apiUrl(`/api/playlists?email=${encodeURIComponent(email)}`))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.data)) {
@@ -54,7 +55,7 @@ export default function Playlists({ playlists: externalPlaylists, refreshPlaylis
   }, [email, externalPlaylists]);
 
   useEffect(() => {
-    fetch("/api/audios")
+    fetch(apiUrl("/api/audios"))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.data)) setAudios(data.data);
@@ -66,7 +67,7 @@ export default function Playlists({ playlists: externalPlaylists, refreshPlaylis
     if (refreshPlaylists && email) {
       refreshPlaylists(email);
     } else if (!externalPlaylists && email) {
-      fetch(`/api/playlists?email=${encodeURIComponent(email)}`)
+      fetch(apiUrl(`/api/playlists?email=${encodeURIComponent(email)}`))
         .then((res) => res.json())
         .then((data) => {
           if (data?.success && Array.isArray(data.data)) setLocalPlaylists(data.data);
@@ -78,7 +79,7 @@ export default function Playlists({ playlists: externalPlaylists, refreshPlaylis
   async function handleCreate() {
     const name = newName.trim();
     if (!name || !email) return;
-    const res = await fetch("/api/playlists", {
+    const res = await fetch(apiUrl("/api/playlists"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, userEmail: email }),
@@ -95,7 +96,7 @@ export default function Playlists({ playlists: externalPlaylists, refreshPlaylis
   async function handleDeletePlaylist(id) {
     if (!confirm("Xóa danh sách phát này?")) return;
     try {
-      await fetch(`/api/playlists/${id}`, { method: "DELETE" });
+      await fetch(apiUrl(`/api/playlists/${id}`), { method: "DELETE" });
     } catch {}
     const updated = effectivePlaylists.filter((p) => p.id !== id);
     if (!externalPlaylists) setLocalPlaylists(updated);
@@ -107,7 +108,7 @@ export default function Playlists({ playlists: externalPlaylists, refreshPlaylis
     const isCurrentlyIn = selectedAudios.some((a) => a.id === audioId);
     if (isCurrentlyIn) {
       try {
-        await fetch(`/api/playlists/${playlistId}/audio/${audioId}`, { method: "DELETE" });
+        await fetch(apiUrl(`/api/playlists/${playlistId}/audio/${audioId}`), { method: "DELETE" });
       } catch {}
       setSelectedAudios((prev) => prev.filter((a) => a.id !== audioId));
       if (!externalPlaylists) {
@@ -115,7 +116,7 @@ export default function Playlists({ playlists: externalPlaylists, refreshPlaylis
       }
     } else {
       try {
-        const res = await fetch(`/api/playlists/${playlistId}/audio/${audioId}`, {
+        const res = await fetch(apiUrl(`/api/playlists/${playlistId}/audio/${audioId}`), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userEmail: email }),
@@ -159,7 +160,8 @@ export default function Playlists({ playlists: externalPlaylists, refreshPlaylis
     setSelectedAudios([]);
     setLoadingAudios(true);
     try {
-      const res = await fetch(`/api/playlists/${playlist.id}/audios${email ? `?email=${encodeURIComponent(email)}` : ""}`);
+      const query = email ? `?email=${encodeURIComponent(email)}` : "";
+      const res = await fetch(apiUrl(`/api/playlists/${playlist.id}/audios${query}`));
       const data = await res.json().catch(() => ({}));
       if (data?.success && Array.isArray(data.data)) {
         const found = data.data.map((id) => audios.find((a) => a.id === id)).filter(Boolean);
@@ -171,7 +173,8 @@ export default function Playlists({ playlists: externalPlaylists, refreshPlaylis
 
   async function playPlaylist(playlist) {
     if (!playlist || playlist.audioCount === 0) return;
-    const res = await fetch(`/api/playlists/${playlist.id}/audios${email ? `?email=${encodeURIComponent(email)}` : ""}`);
+    const query = email ? `?email=${encodeURIComponent(email)}` : "";
+    const res = await fetch(apiUrl(`/api/playlists/${playlist.id}/audios${query}`));
     const data = await res.json().catch(() => ({}));
     let playlistAudios = [];
     if (data?.success && Array.isArray(data.data)) {

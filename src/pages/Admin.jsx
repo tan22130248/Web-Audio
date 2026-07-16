@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
+import { apiUrl } from "../config/api";
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=128";
 
@@ -31,7 +32,7 @@ export default function Admin() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("/api/auth/users", {
+    fetch(apiUrl("/api/auth/users"), {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
       .then((res) => res.json())

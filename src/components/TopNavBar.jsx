@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { apiUrl } from "../config/api";
 
 const AUTH_CHANGE_EVENT = "auth-change";
 const DEBOUNCE_MS = 120;
@@ -72,7 +73,7 @@ export default function TopNavBar({ onSearchSelect }) {
   useEffect(() => {
     const email = localStorage.getItem("email");
     if (!email) return;
-    fetch(`/api/auth/me?email=${encodeURIComponent(email)}`)
+    fetch(apiUrl(`/api/auth/me?email=${encodeURIComponent(email)}`))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && data?.data) {
@@ -111,7 +112,7 @@ export default function TopNavBar({ onSearchSelect }) {
     }
     setIsSearching(true);
     try {
-      const res = await fetch(`/api/audios/search?q=${encodeURIComponent(q)}`);
+      const res = await fetch(apiUrl(`/api/audios/search?q=${encodeURIComponent(q)}`));
       const data = await res.json().catch(() => ({}));
       if (data?.success && Array.isArray(data.data)) {
         const mapped = data.data.map(mapAudioToItem);
@@ -165,7 +166,7 @@ export default function TopNavBar({ onSearchSelect }) {
     if (!email) return;
     setNotifLoading(true);
     try {
-      const res = await fetch(`/api/notifications?email=${encodeURIComponent(email)}`);
+      const res = await fetch(apiUrl(`/api/notifications?email=${encodeURIComponent(email)}`));
       const data = await res.json().catch(() => ({}));
       if (data?.success) {
         setNotifications(Array.isArray(data.data) ? data.data : []);
@@ -182,7 +183,7 @@ export default function TopNavBar({ onSearchSelect }) {
     const email = syncEmail();
     if (!email) return;
     try {
-      const res = await fetch(`/api/notifications/settings?email=${encodeURIComponent(email)}`);
+      const res = await fetch(apiUrl(`/api/notifications/settings?email=${encodeURIComponent(email)}`));
       const data = await res.json().catch(() => ({}));
       if (data?.success && data?.data) {
         setNotificationEnabled(Boolean(data.data.notificationEnabled));
@@ -203,7 +204,7 @@ export default function TopNavBar({ onSearchSelect }) {
 
   async function handleMarkRead(id) {
     try {
-      await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });
+      await fetch(apiUrl(`/api/notifications/${id}/read`), { method: "PATCH" });
       setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, isRead: true } : n));
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch {
@@ -215,7 +216,7 @@ export default function TopNavBar({ onSearchSelect }) {
     const email = syncEmail();
     if (!email) return;
     try {
-      await fetch(`/api/notifications/read-all?email=${encodeURIComponent(email)}`, { method: "PATCH" });
+      await fetch(apiUrl(`/api/notifications/read-all?email=${encodeURIComponent(email)}`), { method: "PATCH" });
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);
     } catch {
@@ -229,7 +230,7 @@ export default function TopNavBar({ onSearchSelect }) {
     setTogglingNotif(true);
     try {
       const newValue = !notificationEnabled;
-      const res = await fetch(`/api/notifications/settings?email=${encodeURIComponent(email)}`, {
+      const res = await fetch(apiUrl(`/api/notifications/settings?email=${encodeURIComponent(email)}`), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: newValue }),

@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-const API_BASE = "/api/users";
+import { apiUrl } from "../config/api";
+
+const API_BASE = apiUrl("/api/users");
 
 const GENDER_OPTIONS = [
   { value: "", label: "Chưa chọn" },

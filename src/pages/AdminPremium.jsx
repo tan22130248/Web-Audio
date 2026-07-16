@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
+import { apiUrl } from "../config/api";
 
 const STATUS_MAP = {
   PENDING: { label: "Chờ xác nhận", className: "bg-yellow-500/15 text-yellow-300 ring-1 ring-yellow-500/25" },
@@ -23,7 +24,7 @@ export default function AdminPremium() {
 
   function loadRegistrations() {
     setLoading(true);
-    fetch("/api/premium/admin/registrations")
+    fetch(apiUrl("/api/premium/admin/registrations"))
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.data)) {
@@ -37,7 +38,7 @@ export default function AdminPremium() {
   async function handleApprove(id) {
     setProcessingId(id);
     try {
-      const res = await fetch(`/api/premium/registrations/${id}/status`, {
+      const res = await fetch(apiUrl(`/api/premium/registrations/${id}/status`), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "COMPLETED" }),
@@ -63,7 +64,7 @@ export default function AdminPremium() {
     try {
       const body = { status: "CANCELLED" };
       if (rejectReason.trim()) body.reason = rejectReason.trim();
-      const res = await fetch(`/api/premium/registrations/${rejectTarget.id}/status`, {
+      const res = await fetch(apiUrl(`/api/premium/registrations/${rejectTarget.id}/status`), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -84,7 +85,7 @@ export default function AdminPremium() {
     if (!confirm("Xóa đăng ký này?")) return;
     setProcessingId(id);
     try {
-      await fetch(`/api/premium/registrations/${id}`, { method: "DELETE" });
+      await fetch(apiUrl(`/api/premium/registrations/${id}`), { method: "DELETE" });
       setRegistrations((prev) => prev.filter((r) => r.id !== id));
     } catch {
       // ignore
