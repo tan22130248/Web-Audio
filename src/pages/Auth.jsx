@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const API_BASE = "/api/auth";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+const GOOGLE_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
 
 const illustrationUrl =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDmVF3EZkGzfd8phkX1k09h_TlFiAmPPyc9aFFBXF3u13fLR_jGZxW9p-3JUhC6Xu5_MAVQylMzlxiefRO4PtgLw6mJKu0MGyjw2likqkjJyk3o2xasa1vH0h7EESK8SG8ShOqxPovQ6FzzjiP1VFbZnHWbNamVGNbwgfM_VQNXNzfptk_zGIuSjl3eNY6Tjt8iFBfa2ugyPi1zKdMcJUHs9QeiCvXsdqocaaCsWxmpiIzSt11qXXs0hKZJW5tklStYhgEuNCiK6jCB";
@@ -18,22 +20,6 @@ function GoogleIcon() {
   );
 }
 
-function FacebookIcon() {
-  return (
-    <svg className="h-4 w-4" fill="#1877F2" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-    </svg>
-  );
-}
-
-function AppleIcon() {
-  return (
-    <svg className="h-4 w-4" fill="#000000" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M17.05 20.28c-.98.95-2.05 1.78-3.32 1.78-1.24 0-1.63-.76-3.12-.76-1.5 0-1.93.74-3.12.76-1.25 0-2.39-.88-3.41-1.85-2.08-1.98-3.18-5.33-1.07-8.91 1.05-1.78 2.88-2.91 4.54-2.91 1.25 0 2.18.72 3.12.72s1.87-.72 3.12-.72c1.37 0 2.76.62 3.65 1.69-2.28 1.36-1.92 4.67.45 5.61-.43 1.25-1.14 2.59-1.84 3.59zM12.03 7.25c-.15-2.23 1.66-4.07 3.32-4.25.26 2.37-1.81 4.25-3.32 4.25z" />
-    </svg>
-  );
-}
-
 function Field({ label, children }) {
   return (
     <label className="block">
@@ -43,10 +29,33 @@ function Field({ label, children }) {
   );
 }
 
+function loadGoogleScript() {
+  return new Promise((resolve, reject) => {
+    if (window.google?.accounts?.id) {
+      resolve();
+      return;
+    }
+    const existing = document.querySelector(`script[src="${GOOGLE_SCRIPT_SRC}"]`);
+    if (existing) {
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener("error", () => reject(new Error("Không tải được Google SDK.")), { once: true });
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = GOOGLE_SCRIPT_SRC;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Không tải được Google SDK."));
+    document.head.appendChild(script);
+  });
+}
+
 export default function Auth({ initialMode = "register" }) {
   const [mode, setMode] = useState(initialMode);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -56,9 +65,130 @@ export default function Auth({ initialMode = "register" }) {
 
   const navigate = useNavigate();
   const isRegister = mode === "register";
+  const googleReadyRef = useRef(false);
+  const googleBtnRef = useRef(null);
 
   const inputClass =
     "h-8 w-full rounded-md border-0 bg-[#19182d] px-3 text-[10px] font-semibold text-white outline-none placeholder:text-white/42 focus:ring-2 focus:ring-primary-container";
+
+  const completeLogin = useCallback((userData) => {
+    localStorage.setItem("token", userData.token || "");
+    localStorage.setItem("fullName", userData.fullName || "");
+    localStorage.setItem("email", userData.email || "");
+    localStorage.setItem("role", userData.role || "USER");
+    localStorage.setItem("planType", userData.planType || "FREE");
+    if (userData.avatar) {
+      localStorage.setItem("avatar", userData.avatar);
+    }
+    window.dispatchEvent(new Event("auth-change"));
+    toast.success("Đăng nhập thành công!");
+    const normalizedRole = (userData.role || "").toLowerCase();
+    if (normalizedRole === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/home");
+    }
+  }, [navigate]);
+
+  const handleGoogleCredential = useCallback(async (response) => {
+    const idToken = response?.credential;
+    if (!idToken) {
+      toast.error("Không nhận được token từ Google.");
+      return;
+    }
+
+    setGoogleLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data?.message || "Đăng nhập Google thất bại.");
+        return;
+      }
+      completeLogin(data?.data || {});
+    } catch {
+      toast.error("Không thể kết nối đến máy chủ. Vui lòng thử lại sau.");
+    } finally {
+      setGoogleLoading(false);
+    }
+  }, [completeLogin]);
+
+  const initGoogle = useCallback(() => {
+    if (!window.google?.accounts?.id || !GOOGLE_CLIENT_ID) return false;
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true,
+      ux_mode: "popup",
+    });
+    if (googleBtnRef.current) {
+      googleBtnRef.current.innerHTML = "";
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        type: "icon",
+        shape: "rectangular",
+        theme: "outline",
+        size: "large",
+      });
+    }
+    googleReadyRef.current = true;
+    return true;
+  }, [handleGoogleCredential]);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+
+    let cancelled = false;
+    loadGoogleScript()
+      .then(() => {
+        if (cancelled) return;
+        initGoogle();
+      })
+      .catch(() => {
+        googleReadyRef.current = false;
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initGoogle]);
+
+  async function handleGoogleClick() {
+    if (!GOOGLE_CLIENT_ID) {
+      toast.error("Chưa cấu hình VITE_GOOGLE_CLIENT_ID.");
+      return;
+    }
+    if (googleLoading) return;
+
+    try {
+      await loadGoogleScript();
+      if (!window.google?.accounts?.id) {
+        toast.error("Google SDK chưa sẵn sàng.");
+        return;
+      }
+      if (!googleReadyRef.current) {
+        initGoogle();
+      }
+
+      const hiddenBtn = googleBtnRef.current?.querySelector("div[role='button']");
+      if (hiddenBtn) {
+        hiddenBtn.click();
+        return;
+      }
+
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          toast.error("Không thể mở đăng nhập Google. Thêm origin http://localhost:5173 vào Google Cloud Console.");
+        }
+      });
+    } catch {
+      toast.error("Không tải được Google Sign-In.");
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -152,21 +282,7 @@ export default function Auth({ initialMode = "register" }) {
           return;
         }
 
-        const userData = data?.data || {};
-        localStorage.setItem("token", userData.token || "");
-        localStorage.setItem("fullName", userData.fullName || "");
-        localStorage.setItem("email", userData.email || "");
-        localStorage.setItem("role", userData.role || "USER");
-        localStorage.setItem("planType", userData.planType || "FREE");
-        window.dispatchEvent(new Event("auth-change"));
-
-        toast.success("Đăng nhập thành công!");
-        const normalizedRole = (userData.role || "").toLowerCase();
-        if (normalizedRole === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/home");
-        }
+        completeLogin(data?.data || {});
       }
     } catch (err) {
       toast.error("Không thể kết nối đến máy chủ. Vui lòng thử lại sau.");
@@ -349,16 +465,24 @@ export default function Auth({ initialMode = "register" }) {
               <span className="h-px flex-1 bg-[#ded9e8]" />
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <button className="flex h-10 items-center justify-center rounded-md border border-[#d6d1df] transition-colors hover:bg-[#f4f2ff]" type="button" aria-label="Tiếp tục với Google">
-                <GoogleIcon />
+            <div className="relative">
+              <button
+                className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-[#d6d1df] text-[11px] font-extrabold text-[#2b2840] transition-colors hover:bg-[#f4f2ff] disabled:opacity-60"
+                type="button"
+                aria-label="Tiếp tục với Google"
+                onClick={handleGoogleClick}
+                disabled={googleLoading || loading}
+              >
+                {googleLoading ? (
+                  <span className="text-[10px] font-bold text-[#5f5a72]">Đang đăng nhập...</span>
+                ) : (
+                  <>
+                    <GoogleIcon />
+                    <span>Đăng nhập với Google</span>
+                  </>
+                )}
               </button>
-              <button className="flex h-10 items-center justify-center rounded-md border border-[#d6d1df] transition-colors hover:bg-[#f4f2ff]" type="button" aria-label="Tiếp tục với Facebook">
-                <FacebookIcon />
-              </button>
-              <button className="flex h-10 items-center justify-center rounded-md border border-[#d6d1df] transition-colors hover:bg-[#f4f2ff]" type="button" aria-label="Tiếp tục với Apple">
-                <AppleIcon />
-              </button>
+              <div ref={googleBtnRef} className="pointer-events-none absolute inset-0 overflow-hidden opacity-0" aria-hidden="true" />
             </div>
           </div>
         </section>
