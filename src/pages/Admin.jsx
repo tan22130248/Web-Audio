@@ -1,105 +1,85 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import AdminSidebar from "../components/AdminSidebar";
 
-const users = [
-  {
-    name: "Nguyễn Minh Tuấn",
-    email: "tuan.minh@story.vn",
-    plan: "Premium",
-    status: "Hoạt động",
-    phone: "090 123 4567",
-    gender: "Nam",
-    birthday: "12/05/1998",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBGlqQAR-dChHf4EQgDGqf4AHVxRKx28pArui4WydK4sTtxkk5zLEUt_SJe86djRbwc1X7pDwFMbZTzADkzE5AO-0LUHuOt0cStVc5JhU4lryHp6ds-Y2aGc3mW-m9vxpBdYGUMbZb7bBoAbdPWOcHMZyCoUhDGvS9Vbsy-uTF7pxyyPJzJVV4JJ_THW4NDlEb5fDOvphDRTHCQyJw9LCz4Ia8Yqd2If6tqdMZ3bmTu3ureKr2e-wkTAWGX2as_06EG8of9GQxSfTyX",
-  },
-  {
-    name: "Lê Phương Thảo",
-    email: "phuongthao@gmail.com",
-    plan: "Free",
-    status: "Hoạt động",
-    phone: "098 456 1188",
-    gender: "Nữ",
-    birthday: "02/11/2000",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuD5z8YSTo_lfnEDqEuceZMIMnRK1Sf95Ob-H3DXWEtJ1qLV5n2XeLX3qHcXbvRFN1zRVh7e1DsH30L2bUer8WyOUYePjfhijgvhNDbtaw_HBLSoMSzsfa1WjJ3-vfTAz9wWpCHPNT658tLV1aoK3mWXeB4dOK85CWaJvJ-1SJqsdFpgU-sph26JrVv3hZezlKH0rIbtAg_YOGqvFmeShBG1peiK1QFnsdAN4zO9luTXfI5FyG5RIr36NbqKYpXQI2KgTqmhAacchAI9",
-  },
-  {
-    name: "Phạm Hoàng Nam",
-    email: "nampham_92@yahoo.com",
-    plan: "Free",
-    status: "Đã khóa",
-    phone: "091 222 9090",
-    gender: "Nam",
-    birthday: "18/08/1992",
-    avatar:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBQwxEDnOliPmt_FYhHZgv-E1pPLaciyRozh_HJ4UiWZg6UYsgoUPKURaOV3NHFJIW2sXYu0g5EM7XmFLXQFORoM49jCRY7zr2vZos4piOX-qiNaLs54NCzatuCCs8J4WOhFwS_y4FBN_KXsxI5zcLeFXi8k-gQcjy8Zq60D0qCpzK8UCUc1llCAsfx0nloDp_zMDZhULOj0hlWZy5asTip0SV3jBOYiHzD03wpSGPKoig0J9xYxrelYVHGu3RkOjR-Q0ji-hvz8qaH",
-  },
-];
+const DEFAULT_AVATAR = "https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=128";
 
-const navItems = [
-  ["Tổng quan", "dashboard"],
-  ["Quản lý Audio", "mic_external_on"],
-  ["Quản lý người dùng", "group", true],
-  ["Đăng ký Premium", "workspace_premium"],
-  ["Thống kê Doanh thu", "payments"],
-  ["Cài đặt hệ thống", "settings"],
-];
-
-const stats = [
-  {
-    label: "Tổng người dùng",
-    value: "42,892",
-    note: "+12% tháng này",
-    icon: "group",
-    accent: "text-[#f3b4ff]",
-    glow: "from-[#8b5cf6]/35 to-[#ec4899]/10",
-  },
-  {
-    label: "Người dùng mới",
-    value: "1,204",
-    note: "Hôm nay",
-    icon: "person_add",
-    accent: "text-[#ffbd7a]",
-    glow: "from-[#f97316]/30 to-[#facc15]/10",
-  },
-  {
-    label: "Thành viên Premium",
-    value: "8,540",
-    note: "20% tổng số",
-    icon: "workspace_premium",
-    accent: "text-[#ffb0cd]",
-    glow: "from-[#ec4899]/32 to-[#8b5cf6]/10",
-  },
-  {
-    label: "Tỷ lệ rời bỏ",
-    value: "2.4%",
-    note: "-0.5% so với Q3",
-    icon: "group_remove",
-    accent: "text-[#ffb4ab]",
-    glow: "from-[#ef4444]/30 to-[#fb7185]/10",
-    down: true,
-  },
-];
-
-function PlanBadge({ plan }) {
-  const isPremium = plan === "Premium";
+function PlanBadge({ planType }) {
+  const type = (planType || "FREE").toUpperCase();
+  const isPremium = type === "PREMIUM";
+  const isVip = type === "VIP";
   return (
     <span
       className={`inline-flex rounded-full px-2.5 py-1 text-[9px] font-extrabold uppercase shadow-sm ${
-        isPremium
-          ? "primary-gradient text-white"
-          : "bg-white/10 text-white/60 ring-1 ring-white/10"
+        isVip
+          ? "bg-tertiary/18 text-tertiary"
+          : isPremium
+            ? "primary-gradient text-white"
+            : "bg-white/10 text-white/60 ring-1 ring-white/10"
       }`}
     >
-      {plan}
+      {type}
     </span>
   );
 }
 
 export default function Admin() {
-  const [selectedUser, setSelectedUser] = useState(users[0]);
+  const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    fetch("/api/auth/users", {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.data)) {
+          const mapped = data.data.map((u) => ({
+            ...u,
+            avatar: u.avatar || DEFAULT_AVATAR,
+            phone: u.phone || "—",
+            gender: u.gender || "—",
+            birthday: u.birthday || "—",
+            status: u.status || "Hoạt động",
+            planType: u.planType || u.plan || "FREE",
+            planExpiresAt: u.planExpiresAt || null,
+          }));
+          setUsers(mapped);
+          setSelectedUser(mapped[0] || null);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  function formatDate(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    return d.toLocaleDateString("vi-VN");
+  }
+
+  function getRemainingDays(expiresAt) {
+    if (!expiresAt) return null;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const exp = new Date(expiresAt);
+    const diff = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+    return diff;
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("fullName");
+    localStorage.removeItem("email");
+    localStorage.removeItem("role");
+    navigate("/login");
+  }
+
   const selectedMeta = useMemo(() => {
-    const locked = selectedUser.status === "Đã khóa";
+    const locked = selectedUser?.status === "Đã khóa";
     return {
       locked,
       statusClass: locked ? "text-error" : "text-secondary",
@@ -107,62 +87,58 @@ export default function Admin() {
     };
   }, [selectedUser]);
 
+  const stats = useMemo(() => {
+    const total = users.length;
+    const lockedCount = users.filter((u) => u.status === "Đã khóa").length;
+    const activeCount = total - lockedCount;
+    return [
+      {
+        label: "Tổng người dùng",
+        value: total.toLocaleString("vi-VN"),
+        note: "Từ database",
+        icon: "group",
+        accent: "text-[#f3b4ff]",
+        glow: "from-[#8b5cf6]/35 to-[#ec4899]/10",
+      },
+      {
+        label: "Người dùng hoạt động",
+        value: activeCount.toLocaleString("vi-VN"),
+        note: "Đang hoạt động",
+        icon: "person_add",
+        accent: "text-[#ffbd7a]",
+        glow: "from-[#f97316]/30 to-[#facc15]/10",
+      },
+      {
+        label: "Tài khoản đã khóa",
+        value: lockedCount.toLocaleString("vi-VN"),
+        note: "Bị khóa",
+        icon: "workspace_premium",
+        accent: "text-[#ffb0cd]",
+        glow: "from-[#ec4899]/32 to-[#8b5cf6]/10",
+      },
+      {
+        label: "Tỷ lệ Hoạt động",
+        value: total > 0 ? Math.round((activeCount / total) * 100) + "%" : "0%",
+        note: "Tỷ lệ người dùng",
+        icon: "group_remove",
+        accent: "text-[#ffb4ab]",
+        glow: "from-[#ef4444]/30 to-[#fb7185]/10",
+        down: false,
+      },
+    ];
+  }, [users]);
+
   return (
-    <main className="min-h-screen bg-[#f7f6ff] p-3 text-white sm:p-5">
+    <main className="min-h-screen bg-[#f7f6ff] text-white sm:p-5">
       <div className="pointer-events-none fixed inset-0 opacity-[0.42] [background-image:radial-gradient(#7c3aed_1px,transparent_1px)] [background-size:18px_18px]" />
       <div className="relative mx-auto flex min-h-[calc(100vh-2.5rem)] max-w-[1180px] overflow-hidden rounded-[18px] bg-[#0d0c1f] shadow-[0_28px_90px_rgba(21,15,55,0.38)] ring-1 ring-[#7c3aed]/20">
-        <aside className="hidden w-[252px] shrink-0 flex-col border-r border-white/9 bg-[#111026] px-4 py-5 md:flex">
-          <div className="flex items-center gap-3">
-            <div className="primary-gradient flex h-10 w-10 items-center justify-center rounded-xl shadow-lg shadow-primary-container/25">
-              <span className="material-symbols-outlined text-[21px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                auto_stories
-              </span>
-            </div>
-            <div className="min-w-0">
-              <h1 className="truncate font-display-lg text-[17px] font-extrabold leading-5">StoryStream</h1>
-              <p className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-outline">Super Admin</p>
-            </div>
-          </div>
-
-          <nav className="mt-9 flex-1 space-y-2 overflow-y-auto hide-scrollbar">
-            {navItems.map(([label, icon, active]) => (
-              <button
-                className={`group flex h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-[12px] font-extrabold transition-all duration-200 ${
-                  active
-                    ? "bg-primary-container text-white shadow-lg shadow-primary-container/25"
-                    : "text-white/68 hover:translate-x-1 hover:bg-white/8 hover:text-white"
-                }`}
-                key={label}
-                type="button"
-              >
-                <span className="material-symbols-outlined text-[17px]" style={active ? { fontVariationSettings: "'FILL' 1" } : undefined}>
-                  {icon}
-                </span>
-                <span className="truncate">{label}</span>
-              </button>
-            ))}
-          </nav>
-
-          <div className="space-y-3 border-t border-white/10 pt-4">
-            <button className="flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-white/9 text-[11px] font-extrabold transition hover:bg-white/14" type="button">
-              <span className="material-symbols-outlined text-[16px]">support_agent</span>
-              Support Ticket
-            </button>
-            <button className="flex h-8 items-center gap-3 px-2 text-[12px] font-bold text-white/62 transition hover:text-error" type="button">
-              <span className="material-symbols-outlined text-[17px]">logout</span>
-              Log Out
-            </button>
-          </div>
-        </aside>
+        <AdminSidebar activeLabel="Quản lý người dùng" onLogout={handleLogout} />
 
         <section className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#121126]">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_74%_0%,rgba(255,176,205,0.16),transparent_38%),radial-gradient(circle_at_34%_0%,rgba(124,58,237,0.22),transparent_42%)]" />
 
           <header className="relative z-10 grid min-h-[64px] gap-3 border-b border-white/8 bg-[#121126]/84 px-4 py-3 backdrop-blur-xl lg:grid-cols-[minmax(190px,1fr)_minmax(280px,360px)_auto] lg:items-center lg:py-0">
             <div className="flex min-w-0 items-center gap-3">
-              <button className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/8 text-white/75 md:hidden" type="button">
-                <span className="material-symbols-outlined text-[18px]">menu</span>
-              </button>
               <h2 className="truncate font-headline-md text-[22px] font-extrabold leading-7 text-primary">
                 Quản lý người dùng
               </h2>
@@ -228,52 +204,69 @@ export default function Admin() {
                   </button>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[560px] text-left">
-                    <thead className="bg-[#28263d] text-[9px] font-extrabold uppercase text-outline/75">
-                      <tr>
-                        <th className="px-5 py-4">Avatar</th>
-                        <th className="px-5 py-4">Tên người dùng</th>
-                        <th className="px-5 py-4">Email</th>
-                        <th className="px-5 py-4">Trạng thái</th>
-                        <th className="px-5 py-4 text-right">Gói</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/6">
-                      {users.map((user) => {
-                        const locked = user.status === "Đã khóa";
-                        const active = selectedUser.email === user.email;
-                        return (
-                          <tr
-                            className={`group cursor-pointer transition-all duration-200 hover:bg-white/[0.055] ${active ? "bg-primary-container/12 shadow-[inset_3px_0_0_#7c3aed]" : ""}`}
-                            key={user.email}
-                            onClick={() => setSelectedUser(user)}
-                          >
-                            <td className="px-5 py-4">
-                              <img className={`h-9 w-9 rounded-full border border-white/12 object-cover shadow-md ${locked ? "grayscale opacity-70" : ""}`} src={user.avatar} alt={user.name} />
-                            </td>
-                            <td className={`px-5 py-4 text-[12px] font-extrabold leading-4 ${locked ? "text-white/44" : "text-white"}`}>
-                              <span className="block max-w-[150px] truncate">{user.name}</span>
-                            </td>
-                            <td className={`px-5 py-4 text-[12px] font-semibold ${locked ? "text-white/34" : "text-white/62"}`}>
-                              <span className="block max-w-[220px] truncate">{user.email}</span>
-                            </td>
-                            <td className="px-5 py-4">
-                              <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold ${locked ? "text-error" : "text-secondary"}`}>
-                                <span className={`h-1.5 w-1.5 rounded-full ${locked ? "bg-error" : "bg-secondary"}`} />
-                                {user.status}
-                              </span>
-                            </td>
-                            <td className="px-5 py-4 text-right"><PlanBadge plan={user.plan} /></td>
-                          </tr>
+                 <div className="overflow-x-auto">
+                  {loading ? (
+                    <div className="px-5 py-8 text-center text-[11px] text-white/58">Đang tải danh sách người dùng...</div>
+                  ) : (
+                   <table className="w-full min-w-[680px] text-left">
+                     <thead className="bg-[#28263d] text-[9px] font-extrabold uppercase text-outline/75">
+                       <tr>
+                         <th className="px-5 py-4">Avatar</th>
+                         <th className="px-5 py-4">Tên người dùng</th>
+                         <th className="px-5 py-4">Email</th>
+                         <th className="px-5 py-4">Trạng thái</th>
+                         <th className="px-5 py-4 text-right">Gói</th>
+                         <th className="px-5 py-4 text-right">Hạn sử dụng</th>
+                       </tr>
+                     </thead>
+                      <tbody className="divide-y divide-white/6">
+                        {users.map((user) => {
+                          const locked = user.status === "Đã khóa";
+                          const active = selectedUser?.email === user.email;
+                          const remainingDays = getRemainingDays(user.planExpiresAt);
+                          const isExpired = remainingDays !== null && remainingDays <= 0;
+                          return (
+                            <tr
+                              className={`group cursor-pointer transition-all duration-200 hover:bg-white/[0.055] ${active ? "bg-primary-container/12 shadow-[inset_3px_0_0_#7c3aed]" : ""}`}
+                              key={user.email}
+                              onClick={() => setSelectedUser(user)}
+                            >
+                              <td className="px-5 py-4">
+                                <img className={`h-9 w-9 rounded-full border border-white/12 object-cover shadow-md ${locked ? "grayscale opacity-70" : ""}`} src={user.avatar} alt={user.name} />
+                              </td>
+                             <td className={`px-5 py-4 text-[12px] font-extrabold leading-4 ${locked ? "text-white/44" : "text-white"}`}>
+                               <span className="block max-w-[150px] truncate">{user.name}</span>
+                             </td>
+                             <td className={`px-5 py-4 text-[12px] font-semibold ${locked ? "text-white/34" : "text-white/62"}`}>
+                               <span className="block max-w-[220px] truncate">{user.email}</span>
+                             </td>
+                             <td className="px-5 py-4">
+                               <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold ${locked ? "text-error" : "text-secondary"}`}>
+                                 <span className={`h-1.5 w-1.5 rounded-full ${locked ? "bg-error" : "bg-secondary"}`} />
+                                 {user.status}
+                               </span>
+                             </td>
+                             <td className="px-5 py-4 text-right"><PlanBadge planType={user.planType} /></td>
+                             <td className={`px-5 py-4 text-right text-[11px] font-semibold ${isExpired ? "text-error" : "text-white/62"}`}>
+                               {user.planExpiresAt ? (
+                                 <span>
+                                   {formatDate(user.planExpiresAt)}
+                                   {remainingDays !== null && remainingDays > 0 && (
+                                     <span className="ml-1 text-[10px] text-white/45">({remainingDays} ngày)</span>
+                                   )}
+                                 </span>
+                               ) : "—"}
+                             </td>
+                           </tr>
                         );
                       })}
                     </tbody>
                   </table>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/8 px-5 py-3 text-[10px] font-bold text-white/58">
-                  <span>Đang hiển thị 1-10 của 42,892 người dùng</span>
+                  <span>{loading ? "Đang tải..." : `Đang hiển thị 1-${users.length} của ${users.length} người dùng`}</span>
                   <div className="flex items-center gap-1">
                     {["chevron_left", "1", "2", "3", "...", "4289", "chevron_right"].map((item) => (
                       <button className={`flex h-7 min-w-7 items-center justify-center rounded-md px-1.5 transition-colors ${item === "1" ? "bg-primary text-on-primary" : "hover:bg-white/8"}`} key={item} type="button">
@@ -285,24 +278,31 @@ export default function Admin() {
               </section>
 
               <aside className="relative overflow-hidden rounded-xl border border-white/10 bg-[#2a293e] shadow-2xl">
-                <div className="absolute inset-x-5 bottom-0 h-1 rounded-t-full primary-gradient" />
-                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/[0.06] to-transparent" />
-                <div className="relative flex h-14 items-center justify-between border-b border-white/9 px-5">
-                  <h3 className="text-[13px] font-extrabold text-white">Chi tiết người dùng</h3>
-                  <button className="flex h-8 w-8 items-center justify-center rounded-full text-white/70 transition hover:bg-white/8 hover:text-white" type="button">
-                    <span className="material-symbols-outlined text-[17px]">close</span>
-                  </button>
-                </div>
+                <div className="absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_74%_0%,rgba(255,176,205,0.16),transparent_38%),radial-gradient(circle_at_34%_0%,rgba(124,58,237,0.22),transparent_42%)]" />
 
                 <div className="relative p-5">
+                  {!selectedUser ? (
+                    <p className="text-center text-[11px] text-white/58">Đang tải...</p>
+                  ) : (
+                  <>
                   <div className="flex flex-col items-center text-center">
                     <div className="relative">
                       <img className={`h-20 w-20 rounded-xl border-4 border-primary/18 object-cover shadow-xl ${selectedMeta.locked ? "grayscale" : ""}`} src={selectedUser.avatar} alt={selectedUser.name} />
                       <span className={`absolute -right-1 -top-1 h-3.5 w-3.5 rounded-full border-2 border-[#2a293e] ${selectedMeta.statusDot}`} />
                     </div>
                     <h3 className="mt-4 text-[20px] font-extrabold leading-6 text-white">{selectedUser.name}</h3>
-                    <span className="primary-gradient mt-2 rounded-full px-3 py-1 text-[9px] font-extrabold uppercase text-white shadow-md">
-                      {selectedUser.plan === "Premium" ? "Hội viên Premium" : "Tài khoản Free"}
+                    <span className={`mt-2 rounded-full px-3 py-1 text-[9px] font-extrabold uppercase text-white shadow-md ${
+                      selectedUser.planType === "VIP"
+                        ? "bg-tertiary text-on-tertiary"
+                        : selectedUser.planType === "PREMIUM"
+                          ? "primary-gradient text-white"
+                          : "bg-white/10 text-white/60"
+                    }`}>
+                      {selectedUser.planType === "VIP"
+                        ? "Hội viên VIP"
+                        : selectedUser.planType === "PREMIUM"
+                          ? "Hội viên Premium"
+                          : "Tài khoản Free"}
                     </span>
                   </div>
 
@@ -342,6 +342,8 @@ export default function Admin() {
                       </div>
                     </div>
                   </section>
+                  </>
+                  )}
                 </div>
               </aside>
             </div>

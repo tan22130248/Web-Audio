@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
+const API_BASE = "/api/auth";
 
 const illustrationUrl =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDmVF3EZkGzfd8phkX1k09h_TlFiAmPPyc9aFFBXF3u13fLR_jGZxW9p-3JUhC6Xu5_MAVQylMzlxiefRO4PtgLw6mJKu0MGyjw2likqkjJyk3o2xasa1vH0h7EESK8SG8ShOqxPovQ6FzzjiP1VFbZnHWbNamVGNbwgfM_VQNXNzfptk_zGIuSjl3eNY6Tjt8iFBfa2ugyPi1zKdMcJUHs9QeiCvXsdqocaaCsWxmpiIzSt11qXXs0hKZJW5tklStYhgEuNCiK6jCB";
@@ -43,10 +46,134 @@ function Field({ label, children }) {
 export default function Auth({ initialMode = "register" }) {
   const [mode, setMode] = useState(initialMode);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [agreeTerms, setAgreeTerms] = useState(false);
+
+  const navigate = useNavigate();
   const isRegister = mode === "register";
 
   const inputClass =
     "h-8 w-full rounded-md border-0 bg-[#19182d] px-3 text-[10px] font-semibold text-white outline-none placeholder:text-white/42 focus:ring-2 focus:ring-primary-container";
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (isRegister) {
+        if (!fullName.trim() || !email.trim() || !password) {
+          toast.error("Vui lòng điền đầy đủ thông tin.");
+          setLoading(false);
+          return;
+        }
+
+        if (!/^[^@]+@gmail\..+$/.test(email.trim())) {
+          toast.error("Email phải có đuôi @gmail.");
+          setLoading(false);
+          return;
+        }
+
+        if (password.length <= 6) {
+          toast.error("Mật khẩu phải lớn hơn 6 ký tự. VD: \"Matkhau2\"");
+          setLoading(false);
+          return;
+        }
+
+        if (!/[A-Z]/.test(password)) {
+          toast.error("Mật khẩu phải có ít nhất 1 chữ hoa.");
+          setLoading(false);
+          return;
+        }
+
+        if (!/\d/.test(password)) {
+          toast.error("Mật khẩu phải có ít nhất 1 số.");
+          setLoading(false);
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          toast.error("Mật khẩu xác nhận không khớp.");
+          setLoading(false);
+          return;
+        }
+
+        if (!agreeTerms) {
+          toast.error("Bạn cần đồng ý với điều khoản dịch vụ.");
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`${API_BASE}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fullName, email, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          const message = data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
+          toast.error(message);
+          setLoading(false);
+          return;
+        }
+
+        toast.success(data?.message || "Đăng ký thành công! Vui lòng đăng nhập.");
+        setMode("login");
+        setFullName("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        setAgreeTerms(false);
+      } else {
+        if (!email.trim() || !password) {
+          toast.error("Vui lòng nhập email và mật khẩu.");
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`${API_BASE}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          const message = data?.message || "Đăng nhập thất bại. Vui lòng thử lại.";
+          toast.error(message);
+          setLoading(false);
+          return;
+        }
+
+        const userData = data?.data || {};
+        localStorage.setItem("token", userData.token || "");
+        localStorage.setItem("fullName", userData.fullName || "");
+        localStorage.setItem("email", userData.email || "");
+        localStorage.setItem("role", userData.role || "USER");
+        localStorage.setItem("planType", userData.planType || "FREE");
+        window.dispatchEvent(new Event("auth-change"));
+
+        toast.success("Đăng nhập thành công!");
+        const normalizedRole = (userData.role || "").toLowerCase();
+        if (normalizedRole === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/home");
+        }
+      }
+    } catch (err) {
+      toast.error("Không thể kết nối đến máy chủ. Vui lòng thử lại sau.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <main className="min-h-screen bg-[#f4f2ff] p-3 text-white sm:p-5">
@@ -106,6 +233,11 @@ export default function Auth({ initialMode = "register" }) {
 
         <section className="flex items-center justify-center bg-[#0f0f23] px-5 py-10 md:px-8">
           <div className="w-full max-w-[355px] rounded-xl bg-white p-4 text-[#101026] shadow-[0_18px_52px_rgba(0,0,0,0.45)]">
+            <Link to="/" className="mb-3 inline-flex items-center gap-1.5 text-[11px] font-extrabold text-primary-container transition-colors hover:opacity-80">
+              <span className="material-symbols-outlined text-[16px]">home</span>
+              Trang chủ
+            </Link>
+
             <div className="mb-5 grid grid-cols-2 rounded-full bg-[#19182d] p-1">
               <button
                 className={`h-7 rounded-full text-[10px] font-extrabold transition-all ${isRegister ? "bg-primary-container text-white" : "text-white/76 hover:text-white"}`}
@@ -132,20 +264,38 @@ export default function Auth({ initialMode = "register" }) {
               </p>
             </div>
 
-            <form className="space-y-2.5" onSubmit={(event) => event.preventDefault()}>
+            <form className="space-y-2.5" onSubmit={handleSubmit}>
               {isRegister ? (
                 <Field label="Họ tên">
-                  <input className={inputClass} placeholder="Nhập tên của bạn" type="text" />
+                  <input
+                    className={inputClass}
+                    placeholder="Nhập tên của bạn"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                  />
                 </Field>
               ) : null}
 
               <Field label="Email hoặc số điện thoại">
-                <input className={inputClass} placeholder="name@example.com" type="text" />
+                <input
+                  className={inputClass}
+                  placeholder="name@example.com"
+                  type="text"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </Field>
 
               <Field label="Mật khẩu">
                 <div className="relative">
-                  <input className={`${inputClass} pr-9`} placeholder="••••••••" type={showPassword ? "text" : "password"} />
+                  <input
+                    className={`${inputClass} pr-9`}
+                    placeholder="••••••••"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                   <button className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/64" onClick={() => setShowPassword((value) => !value)} type="button" aria-label="Hiện hoặc ẩn mật khẩu">
                     <span className="material-symbols-outlined text-[16px]">{showPassword ? "visibility_off" : "visibility"}</span>
                   </button>
@@ -154,27 +304,42 @@ export default function Auth({ initialMode = "register" }) {
 
               {isRegister ? (
                 <Field label="Xác nhận mật khẩu">
-                  <input className={inputClass} placeholder="••••••••" type="password" />
+                  <input
+                    className={inputClass}
+                    placeholder="••••••••"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
                 </Field>
-              ) : (
-                <div className="text-right">
-                  <a className="text-[10px] font-bold text-primary-container hover:underline" href="#">
-                    Quên mật khẩu?
-                  </a>
-                </div>
-              )}
+                ) : (
+                  <div className="text-right">
+                    <Link to="/forgot-password" className="text-[10px] font-bold text-primary-container hover:underline">
+                      Quên mật khẩu?
+                    </Link>
+                  </div>
+                )}
 
               {isRegister ? (
                 <label className="flex items-start gap-2 py-1 text-[9px] font-semibold leading-4 text-[#7d778d]">
-                  <input className="mt-0.5 h-3.5 w-3.5 rounded text-primary-container focus:ring-primary-container" type="checkbox" />
+                  <input
+                    className="mt-0.5 h-3.5 w-3.5 rounded text-primary-container focus:ring-primary-container"
+                    type="checkbox"
+                    checked={agreeTerms}
+                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                  />
                   <span>
                     Tôi đồng ý với <a className="font-extrabold text-primary-container hover:underline" href="#">Điều khoản dịch vụ</a> và Chính sách bảo mật.
                   </span>
                 </label>
               ) : null}
 
-              <button className="primary-gradient h-10 w-full rounded-md text-[12px] font-extrabold text-white shadow-lg transition-transform active:scale-[0.98]" type="submit">
-                {isRegister ? "Tạo tài khoản" : "Đăng nhập"}
+              <button
+                className="primary-gradient h-10 w-full rounded-md text-[12px] font-extrabold text-white shadow-lg transition-transform active:scale-[0.98] disabled:opacity-60"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? "Đang xử lý..." : isRegister ? "Tạo tài khoản" : "Đăng nhập"}
               </button>
             </form>
 
@@ -201,3 +366,4 @@ export default function Auth({ initialMode = "register" }) {
     </main>
   );
 }
+

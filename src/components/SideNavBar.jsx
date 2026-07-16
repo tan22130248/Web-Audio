@@ -1,15 +1,33 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+
+const AUTH_CHANGE_EVENT = "auth-change";
 
 const mainLinks = [
   ["Trang chủ", "home", "/"],
   ["Khám phá", "explore", "/explore"],
-  ["Thể loại", "category", "/categories"],
+  ["Danh sách phát", "queue_music", "/playlists"],
   ["Yêu thích", "favorite", "/favorites"],
   ["Lịch sử nghe", "history", "/history"],
   ["Premium", "workspace_premium", "/premium"],
 ];
 
 export default function SideNavBar() {
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("fullName");
+    localStorage.removeItem("email");
+    localStorage.removeItem("role");
+    window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+    const savedRole = (localStorage.getItem("role") || "").toLowerCase();
+    if (savedRole === "admin") {
+      navigate("/login");
+    } else {
+      navigate("/home");
+    }
+  }
+
   return (
     <nav className="hidden md:flex fixed left-0 top-0 z-50 h-screen w-40 flex-col border-r border-white/10 bg-[#09091b]/95 p-3 shadow-2xl backdrop-blur-2xl">
       <div className="mb-6 flex items-center gap-2 rounded-xl bg-white/5 px-2 py-2 ring-1 ring-white/10">
@@ -50,13 +68,13 @@ export default function SideNavBar() {
           <span className="material-symbols-outlined text-[16px]">settings</span>
           <span>Cài đặt</span>
         </Link>
-        <Link
-          to="/logout"
-          className="flex items-center gap-2 rounded-full px-3 py-2 text-[12px] font-bold text-white/70 transition-all hover:bg-white/10 hover:text-white"
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-2 rounded-full px-3 py-2 text-[12px] font-bold text-white/70 transition-all hover:bg-white/10 hover:text-white"
         >
           <span className="material-symbols-outlined text-[16px]">logout</span>
           <span>Đăng xuất</span>
-        </Link>
+        </button>
       </div>
     </nav>
   );
