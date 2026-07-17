@@ -5,7 +5,7 @@ import AdminSidebar from "../components/AdminSidebar";
 
 import { apiUrl } from "../config/api";
 
-const API_BASE = apiUrl("/api/ads/admin");
+const API_BASE = apiUrl("/api/promotions/admin");
 
 export default function AdminAds() {
   const navigate = useNavigate();

@@ -89,7 +89,7 @@ function App() {
   async function handleAdWatch() {
     try {
       setAdLoading(true);
-      const res = await fetch(apiUrl("/api/ads/random"));
+      const res = await fetch(apiUrl("/api/promotions/random"));
       const data = await res.json().catch(() => ({}));
       if (data?.success && data.data?.url) {
         window.open(data.data.url, "_blank", "noopener,noreferrer");
