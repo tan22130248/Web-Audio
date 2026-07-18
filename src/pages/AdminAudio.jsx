@@ -125,11 +125,17 @@ export default function AdminAudio() {
     }
     const setUploading = folder === "audios" ? setUploadingAudio : setUploadingCover;
     setUploading(true);
-    const toastId = folder === "audios" ? toast.loading("Đang nén & upload audio (FFmpeg)...") : null;
+    const toastId =
+      folder === "audios"
+        ? toast.loading(
+            `Đang nén & upload (${(file.size / 1024 / 1024).toFixed(0)}MB) — file lớn có thể mất vài phút...`
+          )
+        : null;
     try {
+      // Không đọc duration bằng blob URL (file lớn/mp4 gây ERR_FILE_NOT_FOUND spam).
+      // Backend FFmpeg trả duration + fileSize sau khi nén.
       if (folder === "audios") {
-        const duration = await getAudioDuration(file);
-        setForm((f) => ({ ...f, audioUrl: "", fileSize: file.size, duration }));
+        setForm((f) => ({ ...f, audioUrl: "", fileSize: 0, duration: "…" }));
       }
       const fd = new FormData();
       fd.append("file", file);
@@ -146,20 +152,24 @@ export default function AdminAudio() {
       if (!res.ok || !data?.success) {
         if (toastId) toast.error(data?.message || "Upload thất bại.", { id: toastId });
         else toast.error(data?.message || "Upload thất bại.");
+        if (folder === "audios") {
+          setForm((f) => ({ ...f, duration: f.duration === "…" ? "0:00" : f.duration }));
+        }
         return;
       }
       if (folder === "audios") {
         setForm((f) => ({
           ...f,
           audioUrl: data.url || "",
-          duration: data.duration || f.duration,
-          fileSize: data.fileSize != null ? data.fileSize : f.fileSize,
+          duration: data.duration || "0:00",
+          fileSize: data.fileSize != null ? data.fileSize : 0,
         }));
         const orig = data.originalSize;
         const out = data.fileSize;
+        const dur = data.duration || "";
         const msg =
           orig && out
-            ? `Đã nén & upload: ${(orig / 1024 / 1024).toFixed(1)}MB → ${(out / 1024 / 1024).toFixed(1)}MB`
+            ? `Đã nén: ${(orig / 1024 / 1024).toFixed(1)}MB → ${(out / 1024 / 1024).toFixed(1)}MB${dur ? ` · ${dur}` : ""}`
             : data?.message || "Upload audio thành công!";
         if (toastId) toast.success(msg, { id: toastId });
         else toast.success(msg);
@@ -170,32 +180,14 @@ export default function AdminAudio() {
     } catch {
       if (toastId) toast.error("Không thể kết nối khi upload.", { id: toastId });
       else toast.error("Không thể kết nối khi upload.");
+      if (folder === "audios") {
+        setForm((f) => ({ ...f, duration: f.duration === "…" ? "0:00" : f.duration }));
+      }
     } finally {
       setUploading(false);
+      if (audioInputRef.current) audioInputRef.current.value = "";
+      if (coverInputRef.current) coverInputRef.current.value = "";
     }
-  }
-
-  function getAudioDuration(file) {
-    return new Promise((resolve) => {
-      const url = URL.createObjectURL(file);
-      const audio = new Audio();
-      audio.src = url;
-      audio.addEventListener("loadedmetadata", () => {
-        const seconds = audio.duration;
-        URL.revokeObjectURL(url);
-        if (!Number.isFinite(seconds)) {
-          resolve("0:00");
-          return;
-        }
-        const m = Math.floor(seconds / 60);
-        const s = Math.floor(seconds % 60);
-        resolve(`${m}:${s.toString().padStart(2, "0")}`);
-      });
-      audio.addEventListener("error", () => {
-        URL.revokeObjectURL(url);
-        resolve("0:00");
-      });
-    });
   }
 
   async function handleSubmit(e) {
