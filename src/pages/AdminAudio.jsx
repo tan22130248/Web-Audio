@@ -102,8 +102,28 @@ export default function AdminAudio() {
 
   async function handleFileSelect(file, folder) {
     if (!file) return;
+    if (folder === "audios") {
+      const name = (file.name || "").toLowerCase();
+      const type = (file.type || "").toLowerCase();
+      const ok =
+        name.endsWith(".mp3") ||
+        name.endsWith(".mp4") ||
+        name.endsWith(".m4a") ||
+        name.endsWith(".wav") ||
+        type.startsWith("audio/") ||
+        type === "video/mp4";
+      if (!ok) {
+        toast.error("Chỉ chấp nhận file MP3 hoặc MP4.");
+        return;
+      }
+      if (file.size > 200 * 1024 * 1024) {
+        toast.error("File quá lớn (tối đa 200MB).");
+        return;
+      }
+    }
     const setUploading = folder === "audios" ? setUploadingAudio : setUploadingCover;
     setUploading(true);
+    const toastId = folder === "audios" ? toast.loading("Đang nén & upload audio (FFmpeg)...") : null;
     try {
       if (folder === "audios") {
         const duration = await getAudioDuration(file);
@@ -120,19 +140,34 @@ export default function AdminAudio() {
         headers,
         body: fd,
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.success) {
-        toast.error(data?.message || "Upload thất bại.");
+        if (toastId) toast.error(data?.message || "Upload thất bại.", { id: toastId });
+        else toast.error(data?.message || "Upload thất bại.");
         return;
       }
       if (folder === "audios") {
-        setForm((f) => ({ ...f, audioUrl: data.url || "", duration: data.duration || f.duration }));
+        setForm((f) => ({
+          ...f,
+          audioUrl: data.url || "",
+          duration: data.duration || f.duration,
+          fileSize: data.fileSize != null ? data.fileSize : f.fileSize,
+        }));
+        const orig = data.originalSize;
+        const out = data.fileSize;
+        const msg =
+          orig && out
+            ? `Đã nén & upload: ${(orig / 1024 / 1024).toFixed(1)}MB → ${(out / 1024 / 1024).toFixed(1)}MB`
+            : data?.message || "Upload audio thành công!";
+        if (toastId) toast.success(msg, { id: toastId });
+        else toast.success(msg);
       } else {
         setForm((f) => ({ ...f, coverImageUrl: data.url || DEFAULT_COVER }));
+        toast.success("Upload thành công!");
       }
-      toast.success("Upload thành công!");
     } catch {
-      toast.error("Không thể kết nối khi upload.");
+      if (toastId) toast.error("Không thể kết nối khi upload.", { id: toastId });
+      else toast.error("Không thể kết nối khi upload.");
     } finally {
       setUploading(false);
     }
@@ -328,14 +363,40 @@ export default function AdminAudio() {
                 <input className={inputClass} value={form.duration} onChange={(e) => setForm((f) => ({ ...f, duration: e.target.value }))} placeholder="VD: 45:00" />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] font-extrabold uppercase text-white/38">File audio</label>
-                <input ref={audioInputRef} type="file" accept="audio/*" className="hidden" onChange={(e) => handleFileSelect(e.target.files[0], "audios")} />
+                <label className="mb-1 block text-[10px] font-extrabold uppercase text-white/38">File audio (MP3 / MP4)</label>
+                <input
+                  ref={audioInputRef}
+                  type="file"
+                  accept="audio/mpeg,audio/mp3,audio/mp4,audio/x-m4a,audio/wav,video/mp4,.mp3,.mp4,.m4a,.wav"
+                  className="hidden"
+                  onChange={(e) => handleFileSelect(e.target.files[0], "audios")}
+                />
                 <div className="flex gap-2">
-                  <input className={`${inputClass} flex-1`} value={form.audioUrl} onChange={(e) => setForm((f) => ({ ...f, audioUrl: e.target.value }))} placeholder="Link audio (mp3, wav...)" readOnly={!!form.audioUrl && audioInputRef.current?.files?.length === 0} />
-                  <button type="button" onClick={() => audioInputRef.current?.click()} disabled={uploadingAudio} className="whitespace-nowrap rounded-md bg-white/9 px-3 text-[10px] font-extrabold text-white transition hover:bg-white/14 disabled:opacity-60">
-                    {uploadingAudio ? "Đang upload..." : "Chọn file"}
+                  <input
+                    className={`${inputClass} flex-1`}
+                    value={form.audioUrl}
+                    onChange={(e) => setForm((f) => ({ ...f, audioUrl: e.target.value }))}
+                    placeholder="Link MP3 sau khi nén & upload R2"
+                    readOnly={!!form.audioUrl && audioInputRef.current?.files?.length === 0}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => audioInputRef.current?.click()}
+                    disabled={uploadingAudio}
+                    className="whitespace-nowrap rounded-md bg-white/9 px-3 text-[10px] font-extrabold text-white transition hover:bg-white/14 disabled:opacity-60"
+                  >
+                    {uploadingAudio ? "Đang nén..." : "Chọn file"}
                   </button>
                 </div>
+                <p className="mt-1 text-[9px] font-semibold text-white/40">
+                  Backend nén bằng FFmpeg (mono, 48kbps, 22.05kHz) rồi mới upload Cloudflare R2. MP4 chỉ lấy âm thanh.
+                </p>
+                {form.fileSize > 0 && (
+                  <p className="mt-0.5 text-[9px] font-bold text-primary-fixed/80">
+                    Dung lượng lưu: {(form.fileSize / 1024 / 1024).toFixed(2)} MB
+                    {form.duration ? ` · ${form.duration}` : ""}
+                  </p>
+                )}
                 {form.audioUrl && (
                   <audio controls className="mt-2 h-8 w-full" src={form.audioUrl} />
                 )}
