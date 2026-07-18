@@ -116,8 +116,10 @@ export default function AdminAudio() {
         toast.error("Chỉ chấp nhận file MP3 hoặc MP4.");
         return;
       }
-      if (file.size > 200 * 1024 * 1024) {
-        toast.error("File quá lớn (tối đa 200MB).");
+      // Đồng bộ backend: mặc định 2GB (audio.max-input-mb / multipart 2GB)
+      const MAX_UPLOAD_BYTES = 2 * 1024 * 1024 * 1024;
+      if (file.size > MAX_UPLOAD_BYTES) {
+        toast.error("File quá lớn (tối đa 2GB).");
         return;
       }
     }
