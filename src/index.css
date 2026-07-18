@@ -49,7 +49,7 @@
   --color-tertiary-fixed-dim: "#ffb783";
   --color-on-surface-variant: "#ccc3d8";
 
-  --breakpoint-xs: "320px";
+  --breakpoint-xs: 320px;
 
   --font-display-lg: "Montserrat";
   --font-label-bold: "Be Vietnam Pro";
