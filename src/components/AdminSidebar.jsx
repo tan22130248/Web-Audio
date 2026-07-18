@@ -6,6 +6,7 @@ const ADMIN_NAV_ITEMS = [
   { label: "Quảng cáo", icon: "campaign", to: "/admin/ads" },
   { label: "Quản lý người dùng", icon: "group", to: "/admin" },
   { label: "Đăng ký Premium", icon: "workspace_premium", to: "/admin/premium-registrations" },
+  { label: "Góp ý / Phản hồi", icon: "forum", to: "/admin/feedbacks" },
   { label: "Thống kê Doanh thu", icon: "payments", to: "#" },
   { label: "Cài đặt hệ thống", icon: "settings", to: "#" },
 ];
@@ -71,10 +72,11 @@ export default function AdminSidebar({ activeLabel, onLogout }) {
         </button>
         <button
           type="button"
+          onClick={() => navigate("/admin/feedbacks")}
           className="flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-white/9 text-[11px] font-extrabold transition hover:bg-white/14"
         >
           <span className="material-symbols-outlined text-[16px]">support_agent</span>
-          Support Ticket
+          Góp ý / Phản hồi
         </button>
       </div>
     </aside>

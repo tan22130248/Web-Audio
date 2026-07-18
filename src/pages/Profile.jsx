@@ -54,14 +54,19 @@ export default function Profile() {
       });
       const data = await res.json().catch(() => ({}));
       if (data?.success && data.data) {
+        const avatarUrl = data.data.avatar || "";
         setProfile({
           email: data.data.email || "",
           fullName: data.data.fullName || "",
           phone: data.data.phone || "",
           birthday: data.data.birthday || "",
           gender: data.data.gender || "",
-          avatar: data.data.avatar || "",
+          avatar: avatarUrl,
         });
+        if (avatarUrl) {
+          localStorage.setItem("avatar", avatarUrl);
+          window.dispatchEvent(new Event("auth-change"));
+        }
       } else {
         toast.error(data?.message || "Không thể tải thông tin.");
       }
@@ -149,7 +154,10 @@ export default function Profile() {
 
       const data = await res.json().catch(() => ({}));
       if (res.ok && data?.success && data.data?.avatar) {
-        setProfile((prev) => ({ ...prev, avatar: data.data.avatar }));
+        const avatarUrl = data.data.avatar;
+        setProfile((prev) => ({ ...prev, avatar: avatarUrl }));
+        localStorage.setItem("avatar", avatarUrl);
+        window.dispatchEvent(new Event("auth-change"));
         toast.success("Đổi ảnh đại diện thành công!");
       } else {
         toast.error(data?.message || "Upload ảnh thất bại.");
@@ -202,6 +210,7 @@ export default function Profile() {
         localStorage.removeItem("email");
         localStorage.removeItem("role");
         localStorage.removeItem("planType");
+        localStorage.removeItem("avatar");
         window.dispatchEvent(new Event("auth-change"));
         setTimeout(() => navigate("/login"), 1500);
       } else {

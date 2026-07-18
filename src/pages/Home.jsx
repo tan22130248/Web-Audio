@@ -38,14 +38,20 @@ function mapAudioToStory(audio) {
 
 function StoryAddPlaylistButton({ story, onOpenAddModal }) {
   return (
-    <div className="absolute right-1.5 bottom-1.5 opacity-0 transition-opacity group-hover:opacity-100 z-10" onClick={(e) => { e.stopPropagation(); onOpenAddModal(story); }}>
+    <div
+      className="absolute right-2 bottom-2 z-10 opacity-0 transition-all duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
+      onClick={(e) => {
+        e.stopPropagation();
+        onOpenAddModal(story);
+      }}
+    >
       <div
         role="button"
         tabIndex={0}
         title="Thêm vào danh sách phát"
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-md ring-1 ring-white/15 transition-colors hover:bg-black/75"
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white shadow-lg backdrop-blur-md ring-1 ring-white/20 transition-all duration-200 hover:scale-105 hover:bg-black/80"
       >
-        <span className="material-symbols-outlined text-[16px]">more_vert</span>
+        <span className="material-symbols-outlined text-[17px]">more_vert</span>
       </div>
     </div>
   );
@@ -339,15 +345,18 @@ export default function Home({ activeStory, onActiveStoryChange, onPlayStory, cu
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center text-white">
-        <p className="text-[11px] font-extrabold text-white/58">Đang tải...</p>
+      <main className="flex min-h-screen flex-col items-center justify-center gap-3 px-4 text-white">
+        <div className="h-10 w-10 rounded-full border-2 border-primary/30 border-t-primary-fixed animate-spin" />
+        <p className="text-[13px] font-bold tracking-wide text-white/65">Đang tải...</p>
+        <div className="home-loading-bar h-1 w-40 overflow-hidden rounded-full bg-white/10" />
       </main>
     );
   }
 
   return (
     <>
-      <main className="w-full px-4 pb-28 pt-[4.9rem] text-white md:pl-44 md:pr-8">
+      {/* UI: clearer page rhythm, softer section spacing */}
+      <main className="w-full px-4 pb-32 pt-[4.9rem] text-white sm:px-5 md:pl-44 md:pr-8 lg:pr-10">
         {shouldShowAds() && (
           <AdStickyBar
             viewCount={adViewCount}
@@ -359,44 +368,65 @@ export default function Home({ activeStory, onActiveStoryChange, onPlayStory, cu
         )}
         <div className="mx-auto w-full max-w-6xl">
           {featuredStories.length > 0 && (
-            <section className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-headline-md text-[19px] leading-6 text-white">Nổi bật</h2>
-                <a className="flex items-center gap-0.5 text-[11px] font-extrabold text-primary-fixed transition-colors hover:text-white" href="#">
+            <section className="home-fade-up mb-8">
+              <div className="mb-4 flex items-end justify-between gap-3">
+                <div>
+                  <h2 className="font-headline-md text-[20px] font-extrabold leading-tight tracking-tight text-white sm:text-[22px]">
+                    Nổi bật
+                  </h2>
+                  <p className="mt-0.5 text-[12px] font-medium text-white/45">Những audio được yêu thích nhất</p>
+                </div>
+                <a
+                  className="flex shrink-0 items-center gap-0.5 rounded-full px-2 py-1 text-[12px] font-bold text-primary-fixed transition-all duration-200 hover:bg-white/8 hover:text-white"
+                  href="#"
+                >
                   Xem tất cả
-                  <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
                 </a>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1.2fr_1.2fr_0.75fr]">
+              <div className="home-stagger grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-[1.15fr_1.15fr_0.85fr]">
                 {featuredStories.map((story) => (
                   <button
-                    className="group relative min-h-[156px] cursor-pointer overflow-hidden rounded-xl text-left shadow-xl ring-1 ring-white/10 transition-transform hover:-translate-y-0.5"
+                    className="home-card home-featured group relative min-h-[168px] cursor-pointer overflow-hidden rounded-2xl text-left shadow-xl ring-1 ring-white/10 sm:min-h-[180px]"
                     key={story.title}
                     onClick={() => handleStoryClick(story)}
                     type="button"
                   >
                     <img
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                       src={story.image}
                       alt={story.title}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/5" />
-                    <div className="absolute inset-x-0 bottom-0 p-3 text-white">
-                      <p className="mb-1 text-[9px] font-extrabold uppercase text-tertiary">{story.genre}</p>
-                      <h3 className="font-headline-md line-clamp-1 text-[15px] leading-4 text-white">{story.title}</h3>
-                       <p className="line-clamp-1 text-[10px] font-semibold text-white/78">Tác giả: {story.author}</p>
-                        <div className="mt-1 flex items-center gap-1 text-[9px] font-bold text-white/55">
-                          <span className="material-symbols-outlined text-[11px]">visibility</span>
-                          <span>{(story.viewCount || 0).toLocaleString("vi-VN")} người xem</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-[9px] font-bold text-white/55">
-                          <span className="material-symbols-outlined text-[11px]">favorite</span>
-                          <span>{(likesMap && likesMap[story.id] !== undefined ? likesMap[story.id] : (story.likeCount || 0)).toLocaleString("vi-VN")} lượt thích</span>
-                        </div>
-                        {watchedMap[story.id] > 0 && (
-                        <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/20">
-                          <div className="h-full rounded-full bg-red-500" style={{ width: `${watchedMap[story.id]}%` }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10" />
+                    <div className="home-play-overlay absolute inset-0 z-[5] flex items-center justify-center bg-black/25 pointer-events-none">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-full primary-gradient text-white shadow-xl ring-2 ring-white/30">
+                        <span className="material-symbols-outlined text-[30px] leading-none" style={{ fontVariationSettings: "'FILL' 1" }}>
+                          play_arrow
+                        </span>
+                      </span>
+                    </div>
+                    <div className="absolute inset-x-0 bottom-0 p-3.5 text-white sm:p-4">
+                      <p className="mb-1.5 inline-flex rounded-full bg-black/35 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-tertiary backdrop-blur-sm ring-1 ring-white/10">
+                        {story.genre}
+                      </p>
+                      <h3 className="font-headline-md line-clamp-1 text-[16px] font-extrabold leading-snug tracking-tight text-white sm:text-[17px]">
+                        {story.title}
+                      </h3>
+                      <p className="mt-0.5 line-clamp-1 text-[12px] font-medium text-white/75">Tác giả: {story.author}</p>
+                      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-white/60">
+                        <span className="inline-flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[13px]">visibility</span>
+                          {(story.viewCount || 0).toLocaleString("vi-VN")}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[13px]">favorite</span>
+                          {(likesMap && likesMap[story.id] !== undefined ? likesMap[story.id] : (story.likeCount || 0)).toLocaleString("vi-VN")}
+                        </span>
+                      </div>
+                      {watchedMap[story.id] > 0 && (
+                        <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-white/20">
+                          <div className="h-full rounded-full bg-gradient-to-r from-red-500 to-rose-400" style={{ width: `${watchedMap[story.id]}%` }} />
                         </div>
                       )}
                     </div>
@@ -407,15 +437,15 @@ export default function Home({ activeStory, onActiveStoryChange, onPlayStory, cu
             </section>
           )}
 
-          <section className="mb-6">
-            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+          <section className="home-fade-up mb-7" style={{ animationDelay: "0.08s" }}>
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1.5">
               <button
                 onClick={() => setSelectedGenre(null)}
                 type="button"
-                className={`rounded-full border px-3 py-1.5 text-[11px] font-extrabold whitespace-nowrap shadow-sm transition-transform active:scale-95 ${
+                className={`home-chip rounded-full border px-3.5 py-2 text-[12px] font-extrabold whitespace-nowrap shadow-sm active:scale-95 ${
                   selectedGenre === null
-                    ? "bg-white/15 text-white border-white/25"
-                    : "bg-white/6 text-white/65 border-white/12 hover:bg-white/10 hover:text-white"
+                    ? "border-white/30 bg-white/18 text-white shadow-md shadow-white/5"
+                    : "border-white/10 bg-white/[0.06] text-white/65 hover:border-white/18 hover:bg-white/12 hover:text-white"
                 }`}
               >
                 Tất cả
@@ -428,9 +458,9 @@ export default function Home({ activeStory, onActiveStoryChange, onPlayStory, cu
                     key={genre}
                     onClick={() => setSelectedGenre(isActive ? null : genre)}
                     type="button"
-                    className={`rounded-full border px-3 py-1.5 text-[11px] font-extrabold whitespace-nowrap shadow-sm transition-transform active:scale-95 ${
+                    className={`home-chip rounded-full border px-3.5 py-2 text-[12px] font-extrabold whitespace-nowrap shadow-sm active:scale-95 ${
                       isActive
-                        ? "bg-primary/25 text-primary-fixed border-primary/45"
+                        ? "border-primary/50 bg-primary/30 text-primary-fixed shadow-md shadow-primary/15"
                         : tone
                     }`}
                   >
@@ -442,50 +472,76 @@ export default function Home({ activeStory, onActiveStoryChange, onPlayStory, cu
           </section>
 
           {displayedLatestStories.length > 0 ? (
-            <section className="mb-7">
-              <h2 className="mb-3 font-headline-md text-[19px] leading-6 text-white">
-                {selectedGenre ? `Thể loại: ${selectedGenre}` : "Mới cập nhật"}
-              </h2>
-              <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <section className="home-fade-up mb-9" style={{ animationDelay: "0.12s" }}>
+              <div className="mb-4">
+                <h2 className="font-headline-md text-[20px] font-extrabold leading-tight tracking-tight text-white sm:text-[22px]">
+                  {selectedGenre ? `Thể loại: ${selectedGenre}` : "Mới cập nhật"}
+                </h2>
+                <p className="mt-0.5 text-[12px] font-medium text-white/45">
+                  {selectedGenre ? `Danh sách audio thuộc ${selectedGenre}` : "Vừa được thêm vào thư viện"}
+                </p>
+              </div>
+              <div className="home-stagger grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
                 {displayedLatestStories.map((story) => (
                   <button
-                    className="group relative min-w-0 cursor-pointer rounded-xl bg-white/[0.055] p-2 text-left ring-1 ring-white/10 transition-all hover:bg-white/[0.08] hover:ring-primary/35"
+                    className="home-card group relative min-w-0 cursor-pointer rounded-2xl border border-white/[0.07] bg-white/[0.045] p-2.5 text-left shadow-lg shadow-black/20 ring-1 ring-transparent hover:border-primary/25 hover:bg-white/[0.08] hover:ring-primary/20"
                     key={story.title}
                     onClick={() => handleStoryClick(story)}
                     type="button"
                   >
-                    <div className="relative mb-2 aspect-square overflow-hidden rounded-lg shadow-md">
-                      <img className="h-full w-full object-cover" src={story.image} alt={story.title} />
-                      <div className="absolute top-1.5 left-1.5 rounded bg-black/45 px-1.5 py-0.5 text-[8px] text-white backdrop-blur-md">
+                    <div className="relative mb-2.5 aspect-square overflow-hidden rounded-xl shadow-md">
+                      <img
+                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                        src={story.image}
+                        alt={story.title}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
+                      <div className="absolute top-2 left-2 rounded-md bg-black/55 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-white backdrop-blur-md ring-1 ring-white/10">
                         {story.duration}
                       </div>
-                      <div className="absolute inset-x-0 bottom-0 z-10 flex justify-end p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                      <div className="home-play-overlay absolute inset-0 z-[5] flex items-center justify-center pointer-events-none">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-full primary-gradient text-white shadow-lg ring-2 ring-white/25">
+                          <span className="material-symbols-outlined text-[24px] leading-none" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            play_arrow
+                          </span>
+                        </span>
+                      </div>
+                      <div className="absolute inset-x-0 bottom-0 z-10 flex justify-end p-2 opacity-0 transition-all duration-200 group-hover:opacity-100">
                         <div
-                          className="flex h-7 items-center gap-1 rounded-full bg-black/55 px-2 text-[10px] font-bold text-white backdrop-blur-md ring-1 ring-white/15"
-                          onClick={(e) => { e.stopPropagation(); openAddModal(story); }}
+                          className="flex h-8 items-center gap-1 rounded-full bg-black/65 px-2.5 text-[11px] font-bold text-white shadow-lg backdrop-blur-md ring-1 ring-white/15 transition hover:bg-black/80"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openAddModal(story);
+                          }}
                         >
-                          <span className="material-symbols-outlined text-[15px]">playlist_add</span>
-                          <span>Danh sách</span>
+                          <span className="material-symbols-outlined text-[16px]">playlist_add</span>
+                          <span className="hidden xs:inline sm:inline">Danh sách</span>
                         </div>
                       </div>
                     </div>
-                    <h3 className="line-clamp-1 text-[12px] font-extrabold leading-4 text-white group-hover:text-primary-fixed">{story.title}</h3>
-                    <p className="mb-1 line-clamp-1 text-[10px] font-semibold text-white/62">{story.author}</p>
-                    <div className="mb-1 flex items-center gap-1 text-[9px] font-bold text-white/55">
-                      <span className="material-symbols-outlined text-[11px]">visibility</span>
-                      <span>{(story.viewCount || 0).toLocaleString("vi-VN")} người xem</span>
+                    <h3 className="line-clamp-1 text-[13px] font-extrabold leading-snug tracking-tight text-white transition-colors duration-200 group-hover:text-primary-fixed sm:text-[14px]">
+                      {story.title}
+                    </h3>
+                    <p className="mt-0.5 mb-1.5 line-clamp-1 text-[11px] font-medium text-white/55 sm:text-[12px]">{story.author}</p>
+                    <div className="mb-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[10px] font-semibold text-white/50 sm:text-[11px]">
+                      <span className="inline-flex items-center gap-0.5">
+                        <span className="material-symbols-outlined text-[12px]">visibility</span>
+                        {(story.viewCount || 0).toLocaleString("vi-VN")}
+                      </span>
+                      <span className="inline-flex items-center gap-0.5">
+                        <span className="material-symbols-outlined text-[12px]">favorite</span>
+                        {(likesMap && likesMap[story.id] !== undefined ? likesMap[story.id] : (story.likeCount || 0)).toLocaleString("vi-VN")}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-1 text-[9px] font-bold text-white/55">
-                      <span className="material-symbols-outlined text-[11px]">favorite</span>
-                      <span>{(likesMap && likesMap[story.id] !== undefined ? likesMap[story.id] : (story.likeCount || 0)).toLocaleString("vi-VN")} lượt thích</span>
-                    </div>
-                    <div className="mb-1 flex items-center justify-between text-[9px] font-bold text-white/60">
-                      <span>—</span>
-                      <span className="font-extrabold text-primary-fixed">Free</span>
+                    <div className="mb-1.5 flex items-center justify-between text-[10px] font-bold text-white/55">
+                      <span className="text-white/35">—</span>
+                      <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-extrabold text-primary-fixed ring-1 ring-primary/20">
+                        Free
+                      </span>
                     </div>
                     {watchedMap[story.id] > 0 ? (
                       <div className="h-1 overflow-hidden rounded-full bg-white/10">
-                        <div className="h-full rounded-full bg-red-500" style={{ width: `${watchedMap[story.id]}%` }} />
+                        <div className="h-full rounded-full bg-gradient-to-r from-red-500 to-rose-400" style={{ width: `${watchedMap[story.id]}%` }} />
                       </div>
                     ) : (
                       <div className="h-1 overflow-hidden rounded-full bg-surface-container-highest">
@@ -497,81 +553,112 @@ export default function Home({ activeStory, onActiveStoryChange, onPlayStory, cu
               </div>
             </section>
           ) : (
-            <section className="mb-7">
-              <h2 className="mb-3 font-headline-md text-[19px] leading-6 text-white">{selectedGenre ? `Thể loại: ${selectedGenre}` : "Mới cập nhật"}</h2>
-              <div className="py-10 text-center text-[11px] text-white/42">
-                <span className="material-symbols-outlined text-[36px] text-white/25 block mb-2">search_off</span>
-                Không có audio nào thuộc thể loại "{selectedGenre}".
+            <section className="home-fade-up mb-9">
+              <h2 className="mb-4 font-headline-md text-[20px] font-extrabold leading-tight text-white sm:text-[22px]">
+                {selectedGenre ? `Thể loại: ${selectedGenre}` : "Mới cập nhật"}
+              </h2>
+              <div className="rounded-2xl border border-white/8 bg-white/[0.04] py-12 text-center text-[13px] font-medium text-white/45">
+                <span className="material-symbols-outlined mb-2 block text-[40px] text-white/25">search_off</span>
+                Không có audio nào thuộc thể loại &ldquo;{selectedGenre}&rdquo;.
               </div>
             </section>
           )}
 
           {recommendedStory && (
-            <section>
-              <h2 className="mb-3 font-headline-md text-[19px] leading-6 text-white">Gợi ý cho bạn</h2>
+            <section className="home-fade-up" style={{ animationDelay: "0.16s" }}>
+              <div className="mb-4">
+                <h2 className="font-headline-md text-[20px] font-extrabold leading-tight tracking-tight text-white sm:text-[22px]">
+                  Gợi ý cho bạn
+                </h2>
+                <p className="mt-0.5 text-[12px] font-medium text-white/45">Dựa trên xu hướng nghe gần đây</p>
+              </div>
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
-                  <button
-                    className="glass-panel relative overflow-hidden rounded-xl p-6 text-left ring-1 ring-white/10 transition-all hover:bg-white/[0.085] hover:ring-primary/35"
-                    onClick={() => handleStoryClick(recommendedStory)}
-                    type="button"
-                  >
-                    <div className="relative z-10 flex items-center gap-4">
+                <button
+                  className="home-card glass-panel group relative overflow-hidden rounded-2xl p-5 text-left ring-1 ring-white/10 hover:bg-white/[0.09] hover:ring-primary/30 sm:p-6"
+                  onClick={() => handleStoryClick(recommendedStory)}
+                  type="button"
+                >
+                  <div className="relative z-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                    <div className="relative shrink-0">
                       <img
-                        className="h-32 w-32 flex-none rounded-lg object-cover shadow-2xl"
+                        className="h-28 w-28 rounded-xl object-cover shadow-2xl ring-1 ring-white/10 transition-transform duration-500 group-hover:scale-[1.03] sm:h-32 sm:w-32"
                         src={recommendedStory.image}
                         alt={recommendedStory.title}
                       />
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-extrabold uppercase text-secondary-fixed-dim">Đang thịnh hành</p>
-                          <h3 className="text-[22px] font-extrabold leading-6 text-white">{recommendedStory.title}</h3>
-                          <p className="mb-3 mt-1 text-[11px] font-semibold leading-4 text-white/68">
-                            Cuộc hành trình hào hùng về lịch sử dân tộc qua giọng đọc truyền cảm của NSƯT Thanh Hải.
-                          </p>
-                          <div className="mb-3 flex items-center gap-3 text-[10px] font-bold text-white/55">
-                            <span className="flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[12px]">visibility</span>
-                              {(recommendedStory.viewCount || 0).toLocaleString("vi-VN")} người xem
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[12px]">favorite</span>
-                              {(likesMap && likesMap[recommendedStory.id] !== undefined ? likesMap[recommendedStory.id] : (recommendedStory.likeCount || 0)).toLocaleString("vi-VN")} lượt thích
-                            </span>
-                          </div>
-                           <div className="flex items-center gap-2">
-                             <span className="primary-gradient inline-flex items-center gap-1 rounded-full px-4 py-2 text-[11px] font-bold text-white shadow-lg shadow-primary/25">
-                             <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                               play_arrow
-                             </span>
-                             Nghe ngay
-                           </span>
-                             <div
-                               role="button"
-                               tabIndex={0}
-                               onClick={(e) => { e.stopPropagation(); openAddModal(recommendedStory); }}
-                               className="flex h-8 items-center gap-1.5 rounded-lg border border-white/10 bg-white/8 px-3 text-[10px] font-extrabold text-white transition hover:bg-white/14 hover:border-primary/35"
-                             >
-                               <span className="material-symbols-outlined text-[15px]">playlist_add</span>
-                               Danh sách phát
-                             </div>
-                           </div>
-                        </div>
+                      <span className="home-play-overlay absolute inset-0 flex items-center justify-center rounded-xl bg-black/25 pointer-events-none">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full primary-gradient text-white shadow-lg ring-2 ring-white/25">
+                          <span className="material-symbols-outlined text-[26px] leading-none" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            play_arrow
+                          </span>
+                        </span>
+                      </span>
                     </div>
-                    {watchedMap[recommendedStory.id] > 0 && (
-                      <div className="relative z-10 mt-4 h-1 overflow-hidden rounded-full bg-white/20">
-                        <div className="h-full rounded-full bg-red-500" style={{ width: `${watchedMap[recommendedStory.id]}%` }} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] font-extrabold uppercase tracking-wider text-secondary-fixed-dim">Đang thịnh hành</p>
+                      <h3 className="mt-1 text-[20px] font-extrabold leading-snug tracking-tight text-white sm:text-[22px]">
+                        {recommendedStory.title}
+                      </h3>
+                      <p className="mb-3 mt-1.5 text-[12px] font-medium leading-relaxed text-white/65 sm:text-[13px]">
+                        Cuộc hành trình hào hùng về lịch sử dân tộc qua giọng đọc truyền cảm của NSƯT Thanh Hải.
+                      </p>
+                      <div className="mb-3.5 flex flex-wrap items-center gap-3 text-[11px] font-semibold text-white/55 sm:text-[12px]">
+                        <span className="inline-flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[14px]">visibility</span>
+                          {(recommendedStory.viewCount || 0).toLocaleString("vi-VN")} người xem
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[14px]">favorite</span>
+                          {(likesMap && likesMap[recommendedStory.id] !== undefined
+                            ? likesMap[recommendedStory.id]
+                            : recommendedStory.likeCount || 0
+                          ).toLocaleString("vi-VN")}{" "}
+                          lượt thích
+                        </span>
                       </div>
-                    )}
-                  </button>
-
-                <aside className="flex min-h-[190px] flex-col items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] p-5 text-center shadow-lg">
-                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary-fixed">
-                    <span className="material-symbols-outlined text-[28px]">workspace_premium</span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="primary-gradient inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[12px] font-bold text-white shadow-lg shadow-primary/25 transition-transform duration-200 group-hover:scale-[1.02]">
+                          <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            play_arrow
+                          </span>
+                          Nghe ngay
+                        </span>
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openAddModal(recommendedStory);
+                          }}
+                          className="flex h-10 items-center gap-1.5 rounded-full border border-white/12 bg-white/8 px-3.5 text-[11px] font-extrabold text-white transition-all duration-200 hover:border-primary/40 hover:bg-white/14"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">playlist_add</span>
+                          Danh sách phát
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-[15px] font-extrabold text-white">Gói Hội Viên</h3>
-                  <p className="my-2 text-[10px] font-semibold leading-4 text-white/68">
+                  {watchedMap[recommendedStory.id] > 0 && (
+                    <div className="relative z-10 mt-4 h-1 overflow-hidden rounded-full bg-white/20">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-red-500 to-rose-400"
+                        style={{ width: `${watchedMap[recommendedStory.id]}%` }}
+                      />
+                    </div>
+                  )}
+                </button>
+
+                <aside className="home-card flex min-h-[200px] flex-col items-center justify-center rounded-2xl border border-primary/15 bg-gradient-to-b from-primary/15 via-white/[0.06] to-white/[0.04] p-6 text-center shadow-lg">
+                  <div className="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/25 text-primary-fixed shadow-inner ring-1 ring-primary/20">
+                    <span className="material-symbols-outlined text-[30px]">workspace_premium</span>
+                  </div>
+                  <h3 className="text-[16px] font-extrabold tracking-tight text-white">Gói Hội Viên</h3>
+                  <p className="my-2.5 max-w-[220px] text-[12px] font-medium leading-relaxed text-white/65">
                     Mở khóa toàn bộ kho truyện VIP không giới hạn.
                   </p>
-                  <Link className="w-full rounded-full bg-white px-3 py-2 text-[11px] font-bold text-black" to="/premium">
+                  <Link
+                    className="mt-1 w-full rounded-full bg-white px-4 py-2.5 text-[12px] font-extrabold text-[#1a1030] shadow-md transition-all duration-200 hover:scale-[1.02] hover:bg-primary-fixed hover:shadow-lg active:scale-[0.98]"
+                    to="/premium"
+                  >
                     Nâng cấp ngay
                   </Link>
                 </aside>

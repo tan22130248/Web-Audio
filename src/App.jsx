@@ -11,7 +11,9 @@ import Admin from './pages/Admin'
 import AdminAudio from './pages/AdminAudio'
 import AdminAds from './pages/AdminAds'
 import AdminPremium from './pages/AdminPremium'
+import AdminFeedback from './pages/AdminFeedback'
 import Profile from './pages/Profile'
+import Support from './pages/Support'
 import ForgotPassword from './pages/ForgotPassword'
 import History from './pages/History'
 import Favorites from './pages/Favorites'
@@ -353,10 +355,12 @@ function App() {
         <Route path="/register" element={<Auth initialMode="register" />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/profile" element={<ProfileRouteGuard><Profile /></ProfileRouteGuard>} />
+        <Route path="/support" element={<ProfileRouteGuard><Support /></ProfileRouteGuard>} />
         <Route path="/admin" element={<AdminRouteGuard><Admin /></AdminRouteGuard>} />
         <Route path="/admin/audios" element={<AdminRouteGuard><AdminAudio /></AdminRouteGuard>} />
         <Route path="/admin/ads" element={<AdminRouteGuard><AdminAds /></AdminRouteGuard>} />
         <Route path="/admin/premium-registrations" element={<AdminRouteGuard><AdminPremium /></AdminRouteGuard>} />
+        <Route path="/admin/feedbacks" element={<AdminRouteGuard><AdminFeedback /></AdminRouteGuard>} />
       </Routes>
 
       {!hideAppShell && <BottomNavBar />}

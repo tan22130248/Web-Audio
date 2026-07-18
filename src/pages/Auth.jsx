@@ -12,7 +12,7 @@ const illustrationUrl =
 
 function GoogleIcon() {
   return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
@@ -24,7 +24,9 @@ function GoogleIcon() {
 function Field({ label, children }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-[8px] font-extrabold uppercase text-[#6f6a82]">{label}</span>
+      <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.06em] text-[#6b6580]">
+        {label}
+      </span>
       {children}
     </label>
   );
@@ -69,8 +71,9 @@ export default function Auth({ initialMode = "register" }) {
   const googleReadyRef = useRef(false);
   const googleBtnRef = useRef(null);
 
+  // UI: taller inputs, clearer type scale, soft focus ring
   const inputClass =
-    "h-8 w-full rounded-md border-0 bg-[#19182d] px-3 text-[10px] font-semibold text-white outline-none placeholder:text-white/42 focus:ring-2 focus:ring-primary-container";
+    "auth-input h-11 w-full rounded-xl border border-transparent bg-[#17162a] px-3.5 text-[13px] font-semibold text-white outline-none transition-all duration-200 placeholder:text-white/40 hover:bg-[#1c1b32] focus:border-primary-container/50 focus:bg-[#1a1930] focus:ring-0";
 
   const completeLogin = useCallback((userData) => {
     localStorage.setItem("token", userData.token || "");
@@ -80,6 +83,8 @@ export default function Auth({ initialMode = "register" }) {
     localStorage.setItem("planType", userData.planType || "FREE");
     if (userData.avatar) {
       localStorage.setItem("avatar", userData.avatar);
+    } else {
+      localStorage.removeItem("avatar");
     }
     window.dispatchEvent(new Event("auth-change"));
     toast.success("Đăng nhập thành công!");
@@ -293,51 +298,68 @@ export default function Auth({ initialMode = "register" }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f4f2ff] p-3 text-white sm:p-5">
-      <div className="mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-6xl overflow-hidden rounded-lg border-[5px] border-[#6b5cff] bg-[#0d0d22] shadow-[0_24px_80px_rgba(23,18,70,0.35)] sm:min-h-[calc(100vh-2.5rem)] md:grid-cols-[1.08fr_1fr]">
-        <section className="relative min-h-[430px] overflow-hidden bg-[#071047] md:min-h-full">
+    <main className="auth-fade-in min-h-screen bg-gradient-to-br from-[#f0ecff] via-[#f6f3ff] to-[#ebe6ff] p-3 text-white sm:p-5 lg:p-6">
+      {/* UI: softer page bg, larger radius card, balanced 2-col grid */}
+      <div className="mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-6xl overflow-hidden rounded-2xl border border-[#8b7cff]/40 bg-[#0c0c1f] shadow-[0_28px_90px_rgba(40,28,100,0.28)] sm:min-h-[calc(100vh-2.5rem)] md:grid-cols-[1.05fr_1fr] lg:rounded-3xl">
+        <section className="relative min-h-[380px] overflow-hidden bg-[#071047] sm:min-h-[420px] md:min-h-full">
           <img
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            className="auth-float absolute inset-0 h-full w-full object-cover object-center scale-[1.02]"
             src={illustrationUrl}
             alt="Minh họa nghe truyện audio"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#071047] via-[#071047]/18 to-[#071047]/10" />
-          <div className="absolute inset-y-0 right-0 hidden w-32 bg-gradient-to-r from-transparent to-[#0d0d22]/45 md:block" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#06061a] via-[#071047]/35 to-[#071047]/15" />
+          <div className="absolute inset-y-0 right-0 hidden w-28 bg-gradient-to-r from-transparent to-[#0c0c1f]/50 md:block" />
 
-          <div className="relative z-10 flex h-full flex-col justify-end px-6 pb-8 pt-7 sm:px-8 md:px-10">
-            <div className="max-w-[330px]">
-              <Link className="mb-2 inline-flex items-center gap-2 text-white" to="/">
-                <span className="material-symbols-outlined text-[28px] text-primary-fixed" style={{ fontVariationSettings: "'FILL' 1" }}>
+          <div className="relative z-10 flex h-full flex-col justify-between px-6 py-7 sm:px-8 sm:py-9 md:px-10 md:py-10">
+            <div className="auth-fade-up max-w-[340px]">
+              <Link
+                className="mb-3 inline-flex items-center gap-2 text-white transition-opacity duration-200 hover:opacity-90"
+                to="/"
+              >
+                <span
+                  className="material-symbols-outlined text-[30px] text-primary-fixed drop-shadow-md"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
                   graphic_eq
                 </span>
-                <span className="font-display-lg text-[25px] font-extrabold leading-7">VOX</span>
+                <span className="font-display-lg text-[26px] font-extrabold tracking-tight leading-none">
+                  VOX
+                </span>
               </Link>
-              <h1 className="font-display-lg-mobile text-[29px] font-extrabold leading-8 text-white drop-shadow-lg md:text-[33px] md:leading-9">
+              <h1 className="font-display-lg-mobile text-[28px] font-extrabold leading-[1.15] tracking-tight text-white drop-shadow-lg sm:text-[32px] md:text-[34px] md:leading-[1.12]">
                 Ngàn câu chuyện, một cú chạm
               </h1>
-              <div className="mt-5 max-w-[290px] rounded-lg border border-white/10 bg-white/[0.08] px-4 py-3 backdrop-blur-xl">
-                <p className="text-[11px] font-semibold italic leading-4 text-white/80">
-                  "Âm thanh sống động đưa bạn vào thế giới của trí tưởng tượng vô hạn."
+              <div className="mt-5 max-w-[300px] rounded-2xl border border-white/12 bg-white/[0.1] px-4 py-3.5 shadow-lg backdrop-blur-xl">
+                <p className="text-[12px] font-medium italic leading-relaxed text-white/85 sm:text-[13px]">
+                  &ldquo;Âm thanh sống động đưa bạn vào thế giới của trí tưởng tượng vô hạn.&rdquo;
                 </p>
               </div>
             </div>
 
-            <div className="mt-9 text-center md:text-left">
-              <p className="font-display-lg-mobile text-[31px] font-extrabold leading-8 text-[#e8b8dd] drop-shadow-md">
+            <div className="auth-fade-up auth-delay-2 mt-8 text-center md:mt-10 md:text-left">
+              <p className="font-display-lg-mobile text-[28px] font-extrabold leading-[1.15] tracking-tight text-[#f0c4e6] drop-shadow-md sm:text-[32px]">
                 Welcome!
                 <br />
-                Listen & Dream.
+                Listen &amp; Dream.
               </p>
-              <div className="mt-5 flex items-center justify-center gap-4 md:justify-start">
+              <div className="mt-5 flex items-center justify-center gap-3 md:justify-start">
                 <button
-                  className={`h-9 rounded-full px-7 text-[11px] font-extrabold transition-all ${!isRegister ? "bg-primary-container text-white shadow-lg shadow-primary-container/25" : "bg-white/12 text-white hover:bg-white/18"}`}
+                  className={`h-10 rounded-full px-7 text-[12px] font-extrabold tracking-wide transition-all duration-200 ${
+                    !isRegister
+                      ? "bg-primary-container text-white shadow-lg shadow-primary-container/30 ring-2 ring-white/10"
+                      : "bg-white/12 text-white hover:bg-white/20"
+                  }`}
                   onClick={() => setMode("login")}
                   type="button"
                 >
                   Login
                 </button>
                 <button
-                  className={`h-9 rounded-full border px-7 text-[11px] font-extrabold transition-all ${isRegister ? "border-tertiary bg-tertiary/10 text-tertiary" : "border-white/25 text-white hover:bg-white/10"}`}
+                  className={`h-10 rounded-full border px-7 text-[12px] font-extrabold tracking-wide transition-all duration-200 ${
+                    isRegister
+                      ? "border-tertiary bg-tertiary/15 text-tertiary shadow-md shadow-tertiary/10"
+                      : "border-white/25 text-white hover:border-white/40 hover:bg-white/10"
+                  }`}
                   onClick={() => setMode("register")}
                   type="button"
                 >
@@ -348,23 +370,35 @@ export default function Auth({ initialMode = "register" }) {
           </div>
         </section>
 
-        <section className="flex items-center justify-center bg-[#0f0f23] px-5 py-10 md:px-8">
-          <div className="w-full max-w-[355px] rounded-xl bg-white p-4 text-[#101026] shadow-[0_18px_52px_rgba(0,0,0,0.45)]">
-            <Link to="/" className="mb-3 inline-flex items-center gap-1.5 text-[11px] font-extrabold text-primary-container transition-colors hover:opacity-80">
-              <span className="material-symbols-outlined text-[16px]">home</span>
+        {/* UI: form card slide-in, better padding & type hierarchy */}
+        <section className="flex items-center justify-center bg-gradient-to-b from-[#101028] to-[#0c0c1f] px-4 py-8 sm:px-6 sm:py-10 md:px-8 lg:px-10">
+          <div className="auth-slide-right w-full max-w-[400px] rounded-2xl bg-white p-5 text-[#101026] shadow-[0_20px_60px_rgba(0,0,0,0.4)] sm:p-6 lg:p-7">
+            <Link
+              to="/"
+              className="mb-4 inline-flex items-center gap-1.5 text-[12px] font-bold text-primary-container transition-all duration-200 hover:gap-2 hover:opacity-85"
+            >
+              <span className="material-symbols-outlined text-[18px]">home</span>
               Trang chủ
             </Link>
 
-            <div className="mb-5 grid grid-cols-2 rounded-full bg-[#19182d] p-1">
+            <div className="mb-6 grid grid-cols-2 rounded-full bg-[#17162a] p-1 shadow-inner">
               <button
-                className={`h-7 rounded-full text-[10px] font-extrabold transition-all ${isRegister ? "bg-primary-container text-white" : "text-white/76 hover:text-white"}`}
+                className={`h-9 rounded-full text-[12px] font-extrabold transition-all duration-250 ${
+                  isRegister
+                    ? "bg-primary-container text-white shadow-md shadow-primary-container/25"
+                    : "text-white/70 hover:text-white"
+                }`}
                 onClick={() => setMode("register")}
                 type="button"
               >
                 Đăng ký
               </button>
               <button
-                className={`h-7 rounded-full text-[10px] font-extrabold transition-all ${!isRegister ? "bg-primary-container text-white" : "text-white/76 hover:text-white"}`}
+                className={`h-9 rounded-full text-[12px] font-extrabold transition-all duration-250 ${
+                  !isRegister
+                    ? "bg-primary-container text-white shadow-md shadow-primary-container/25"
+                    : "text-white/70 hover:text-white"
+                }`}
                 onClick={() => setMode("login")}
                 type="button"
               >
@@ -372,16 +406,18 @@ export default function Auth({ initialMode = "register" }) {
               </button>
             </div>
 
-            <div className="mb-4">
-              <h2 className="font-headline-md text-[20px] font-extrabold leading-6 text-[#111125]">
+            <div className="mb-5" key={mode}>
+              <h2 className="auth-fade-up font-headline-md text-[22px] font-extrabold leading-snug tracking-tight text-[#111125] sm:text-[24px]">
                 {isRegister ? "Bắt đầu hành trình" : "Chào mừng trở lại"}
               </h2>
-              <p className="mt-1 text-[10px] font-semibold text-[#8a849b]">
-                {isRegister ? "Khám phá thế giới âm thanh của riêng bạn." : "Tiếp tục câu chuyện đang nghe dở nhé."}
+              <p className="auth-fade-up auth-delay-1 mt-1.5 text-[13px] font-medium leading-relaxed text-[#7a748f]">
+                {isRegister
+                  ? "Khám phá thế giới âm thanh của riêng bạn."
+                  : "Tiếp tục câu chuyện đang nghe dở nhé."}
               </p>
             </div>
 
-            <form className="space-y-2.5" onSubmit={handleSubmit}>
+            <form className="space-y-3.5" onSubmit={handleSubmit}>
               {isRegister ? (
                 <Field label="Họ tên">
                   <input
@@ -407,14 +443,21 @@ export default function Auth({ initialMode = "register" }) {
               <Field label="Mật khẩu">
                 <div className="relative">
                   <input
-                    className={`${inputClass} pr-9`}
+                    className={`${inputClass} pr-11`}
                     placeholder="••••••••"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                  <button className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/64" onClick={() => setShowPassword((value) => !value)} type="button" aria-label="Hiện hoặc ẩn mật khẩu">
-                    <span className="material-symbols-outlined text-[16px]">{showPassword ? "visibility_off" : "visibility"}</span>
+                  <button
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-white/55 transition-colors duration-200 hover:text-white"
+                    onClick={() => setShowPassword((value) => !value)}
+                    type="button"
+                    aria-label="Hiện hoặc ẩn mật khẩu"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      {showPassword ? "visibility_off" : "visibility"}
+                    </span>
                   </button>
                 </div>
               </Field>
@@ -429,30 +472,37 @@ export default function Auth({ initialMode = "register" }) {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                 </Field>
-                ) : (
-                  <div className="text-right">
-                    <Link to="/forgot-password" className="text-[10px] font-bold text-primary-container hover:underline">
-                      Quên mật khẩu?
-                    </Link>
-                  </div>
-                )}
+              ) : (
+                <div className="text-right">
+                  <Link
+                    to="/forgot-password"
+                    className="text-[12px] font-bold text-primary-container transition-opacity duration-200 hover:underline hover:opacity-85"
+                  >
+                    Quên mật khẩu?
+                  </Link>
+                </div>
+              )}
 
               {isRegister ? (
-                <label className="flex items-start gap-2 py-1 text-[9px] font-semibold leading-4 text-[#7d778d]">
+                <label className="flex items-start gap-2.5 py-1 text-[12px] font-medium leading-relaxed text-[#6f6985]">
                   <input
-                    className="mt-0.5 h-3.5 w-3.5 rounded text-primary-container focus:ring-primary-container"
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-[#c9c3d6] text-primary-container focus:ring-primary-container"
                     type="checkbox"
                     checked={agreeTerms}
                     onChange={(e) => setAgreeTerms(e.target.checked)}
                   />
                   <span>
-                    Tôi đồng ý với <a className="font-extrabold text-primary-container hover:underline" href="#">Điều khoản dịch vụ</a> và Chính sách bảo mật.
+                    Tôi đồng ý với{" "}
+                    <a className="font-extrabold text-primary-container hover:underline" href="#">
+                      Điều khoản dịch vụ
+                    </a>{" "}
+                    và Chính sách bảo mật.
                   </span>
                 </label>
               ) : null}
 
               <button
-                className="primary-gradient h-10 w-full rounded-md text-[12px] font-extrabold text-white shadow-lg transition-transform active:scale-[0.98] disabled:opacity-60"
+                className="auth-submit primary-gradient mt-1 h-11 w-full rounded-xl text-[14px] font-extrabold tracking-wide text-white shadow-lg shadow-primary-container/20 transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                 type="submit"
                 disabled={loading}
               >
@@ -460,22 +510,22 @@ export default function Auth({ initialMode = "register" }) {
               </button>
             </form>
 
-            <div className="my-4 flex items-center gap-3">
-              <span className="h-px flex-1 bg-[#ded9e8]" />
-              <span className="text-[9px] font-extrabold text-[#8a849b]">Hoặc tiếp tục với</span>
-              <span className="h-px flex-1 bg-[#ded9e8]" />
+            <div className="my-5 flex items-center gap-3">
+              <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#ddd7e8] to-transparent" />
+              <span className="text-[11px] font-bold tracking-wide text-[#8a849b]">Hoặc tiếp tục với</span>
+              <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#ddd7e8] to-transparent" />
             </div>
 
             <div className="relative">
               <button
-                className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-[#d6d1df] text-[11px] font-extrabold text-[#2b2840] transition-colors hover:bg-[#f4f2ff] disabled:opacity-60"
+                className="auth-google flex h-11 w-full items-center justify-center gap-2.5 rounded-xl border border-[#e0dae9] bg-white text-[13px] font-extrabold text-[#2b2840] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
                 type="button"
                 aria-label="Tiếp tục với Google"
                 onClick={handleGoogleClick}
                 disabled={googleLoading || loading}
               >
                 {googleLoading ? (
-                  <span className="text-[10px] font-bold text-[#5f5a72]">Đang đăng nhập...</span>
+                  <span className="text-[12px] font-bold text-[#5f5a72]">Đang đăng nhập...</span>
                 ) : (
                   <>
                     <GoogleIcon />
@@ -491,4 +541,3 @@ export default function Auth({ initialMode = "register" }) {
     </main>
   );
 }
-

@@ -5,6 +5,9 @@ import { apiUrl } from "../config/api";
 const AUTH_CHANGE_EVENT = "auth-change";
 const DEBOUNCE_MS = 120;
 
+const DEFAULT_USER_AVATAR =
+  "https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=128";
+
 function syncFullName() {
   const savedName = localStorage.getItem("fullName");
   return savedName || "";
@@ -17,6 +20,15 @@ function syncPlanType() {
 
 function syncEmail() {
   return localStorage.getItem("email") || "";
+}
+
+function syncAvatar() {
+  return localStorage.getItem("avatar") || "";
+}
+
+function avatarFallback(name) {
+  const label = encodeURIComponent((name || "User").trim().slice(0, 24) || "User");
+  return `https://ui-avatars.com/api/?name=${label}&background=7c3aed&color=fff&size=128`;
 }
 
 function mapAudioToItem(audio) {
@@ -45,6 +57,7 @@ function formatDate(iso) {
 
 export default function TopNavBar({ onSearchSelect }) {
   const [fullName, setFullName] = useState("");
+  const [avatar, setAvatar] = useState(() => syncAvatar());
   const [planType, setPlanType] = useState(() => syncPlanType());
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -64,6 +77,7 @@ export default function TopNavBar({ onSearchSelect }) {
     const sync = () => {
       setFullName(syncFullName());
       setPlanType(syncPlanType());
+      setAvatar(syncAvatar());
     };
     sync();
     window.addEventListener(AUTH_CHANGE_EVENT, sync);
@@ -80,6 +94,14 @@ export default function TopNavBar({ onSearchSelect }) {
           const pt = (data.data.planType || "FREE").toUpperCase();
           setPlanType(pt);
           localStorage.setItem("planType", pt);
+          if (data.data.fullName) {
+            localStorage.setItem("fullName", data.data.fullName);
+            setFullName(data.data.fullName);
+          }
+          if (data.data.avatar) {
+            localStorage.setItem("avatar", data.data.avatar);
+            setAvatar(data.data.avatar);
+          }
         }
       })
       .catch(() => {})
@@ -390,11 +412,15 @@ export default function TopNavBar({ onSearchSelect }) {
                 <p className="text-[11px] font-extrabold text-white">{fullName}</p>
                 <p className={`text-[9px] font-extrabold ${planClass}`}>{planLabel}</p>
               </div>
-              <div className="h-8 w-8 overflow-hidden rounded-full border-2 border-white/20 shadow-md">
+              <div className="h-8 w-8 overflow-hidden rounded-full border-2 border-white/20 shadow-md ring-1 ring-white/10">
                 <img
                   className="h-full w-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIuBN1zy52wRs9rnYcmKKKvjVdOmcKPz4_CV_IaticrnUtjpogQ2g_RdhzgcxL3Q136bvNulN2pnuA-Jho5wF4nPd9sJBg3_CablcfWf_JuOXGWnxK9389jfxFdeNJVkFQgUQToaoGYuSRNoVH5qAJ7HrKi_S09mOTE67xncb685mfZwm18sOy0f8U7ljs6KHiTfuNMgjiBadmt94u3zv4V-L0OWYi1cm8knZGypLJyvAEbookJyHrTwxfKNDobjuQ1ZSpbXeiTzx4"
+                  src={avatar || avatarFallback(fullName)}
                   alt="Tài khoản"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = avatarFallback(fullName);
+                  }}
                 />
               </div>
             </Link>
@@ -412,12 +438,8 @@ export default function TopNavBar({ onSearchSelect }) {
               >
                 Đăng ký
               </Link>
-              <div className="h-8 w-8 cursor-pointer overflow-hidden rounded-full border-2 border-white/20 shadow-md">
-                <img
-                  className="h-full w-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIuBN1zy52wRs9rnYcmKKKvjVdOmcKPz4_CV_IaticrnUtjpogQ2g_RdhzgcxL3Q136bvNulN2pnuA-Jho5wF4nPd9sJBg3_CablcfWf_JuOXGWnxK9389jfxFdeNJVkFQgUQToaoGYuSRNoVH5qAJ7HrKi_S09mOTE67xncb685mfZwm18sOy0f8U7ljs6KHiTfuNMgjiBadmt94u3zv4V-L0OWYi1cm8knZGypLJyvAEbookJyHrTwxfKNDobjuQ1ZSpbXeiTzx4"
-                  alt="Tài khoản"
-                />
+              <div className="h-8 w-8 overflow-hidden rounded-full border-2 border-white/20 shadow-md">
+                <img className="h-full w-full object-cover" src={DEFAULT_USER_AVATAR} alt="Tài khoản" />
               </div>
             </div>
           )}
